@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0812">
+  <meta name="description" content="Un pequeño rincón para recordar nuestras rolitas y algunos momentos.">
+  <title>Nuestras rolitas</title>
+  <link rel="icon" href="images/ev.jpg" type="image/jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="ambient ambient--one" aria-hidden="true"></div>
+  <div class="ambient ambient--two" aria-hidden="true"></div>
+
+  <main class="page-shell">
+    <header class="intro">
+      <p class="eyebrow"><span class="eyebrow-dot"></span> UN PEQUEÑO RINCÓN NUESTRO</p>
+      <h1>Nuestras <em>rolitas</em><span class="title-heart">♡</span></h1>
+      <p class="intro-copy">Una página con mensajes y canciones.</p>
+      <a class="scroll-cue" href="#message-title" aria-label="Bajar al mensajito"><span></span> DESLIZA PARA CONTINUAR <i class="fa-solid fa-arrow-down"></i></a>
+    </header>
+
+    <section class="memory-section" aria-labelledby="message-title">
+      <div class="section-heading">
+        <span class="section-index">01 / UN MENSAJITO</span>
+        <span class="section-line"></span>
+      </div>
+      <h2 id="message-title" class="section-title">Mensajes<span>…</span></h2>
+
+      <div class="phone-stage">
+        <div class="phone">
+          <div class="phone-side-button phone-side-button--left"></div>
+          <div class="phone-side-button phone-side-button--right"></div>
+          <div class="phone-screen">
+            <div class="phone-status">
+              <span>9:41</span>
+              <span class="status-icons"><i class="fa-solid fa-signal"></i><i class="fa-solid fa-wifi"></i><i class="fa-solid fa-battery-three-quarters"></i></span>
+            </div>
+            <div class="chat-topbar">
+              <span class="back-arrow"><i class="fa-solid fa-chevron-left"></i></span>
+              <div class="chat-avatar">♡</div>
+              <div class="chat-contact">
+                <strong>Bolitocha ❤️</strong>
+                <small>un recuerdo bonito</small>
+              </div>
+              <i class="fa-solid fa-ellipsis"></i>
+            </div>
+
+            <div class="notification">¿No piensas volver? <span>ahora</span></div>
+
+            <div class="chat-content">
+              <div class="chat-date">ALGUNAS COSAS QUE QUEDARON POR DECIR</div>
+              <div class="texts">
+                <div class="blocker" aria-hidden="true"></div>
+                <div class="text">Holaaaaaaaa</div>
+                <div class="text">supongo que volviste a entrar</div>
+                <div class="text">xd</div>
+                <div class="text">como lo dije antes, tengo mil cosas por decir...</div>
+                <div class="text">pero no sé, creo que estás decidida con tu pensamiento</div>
+                <div class="text">y no quiero molestarte</div>
+                <div class="text">llegará el momento en el que ambos ya perdamos el "camino"</div>
+                <div class="text">parece que ambos esperamos lo mismo del otro, pero ninguno da el paso</div>
+                <div class="text">o eso creo jajaja</div>
+                <div class="text">y puejj</div>
+                <div class="text">🤔</div>
+                <div class="text">supongo que somos víctimas de nuestra mente</div>
+                <div class="text">y por último puessss acá quedarán algunos de nuestros cortos momentos</div>
+                <div class="text">quizás en un futuro hasta hablemos de esto</div>
+                <div class="text">Depende de nosotros...</div>
+                <div class="text">espero entres aquí y escuches algunas de nuestras rolitas, posiblemente también lo esté haciendo</div>
+                <div class="text">y por sí acaso sigue bajando panzona 👇</div>
+              </div>
+              <div class="fake-keyboard" aria-hidden="true">
+                <div class="keyboard-input"><span></span><b>↑</b></div>
+                <div class="keyboard-row">Negra panzona</div>
+                <div class="keyboard-row">Te odio</div>
+                <div class="keyboard-row">zxcvbnm</div>
+                <div class="keyboard-bottom"><span>123</span><i></i><span>return</span></div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+        </div>
+        <p class="phone-caption"><i class="fa-regular fa-heart"></i> Mensajes anteriores</p>
+      </div>
+    </section>
+
+    <section class="music-section" aria-labelledby="music-title">
+      <div class="section-heading">
+        <span class="section-index">02 / NUESTRA PLAYLIST</span>
+        <span class="section-line"></span>
+      </div>
+      <h2 id="music-title" class="section-title">Reproductor musical<span>♡</span></h2>
+      <p class="music-intro">Seis canciones en una sola playlist.</p>
+
+      <div class="player-card">
+        <div class="player-topline">
+          <span><span class="live-dot"></span> REPRODUCTOR DE MÚSICA</span>
+          <span class="playlist-count">06 TRACKS</span>
+        </div>
+
+        <div class="player-layout">
+          <div class="album-column">
+            <div class="album-frame">
+              <div class="track-art" role="img" aria-label="Portada de la canción actual"></div>
+              <div class="album-shine" aria-hidden="true"></div>
+            </div>
+            <div class="equalizer" id="wave" aria-hidden="true">
+              <span class="stroke"></span><span class="stroke"></span><span class="stroke"></span>
+              <span class="stroke"></span><span class="stroke"></span><span class="stroke"></span><span class="stroke"></span>
+            </div>
+          </div>
+
+          <div class="player-main">
+            <div class="track-meta">
+              <p class="now-playing">CANCIÓN 01 DE 06</p>
+              <h3 class="track-name">Espero no lo olvides</h3>
+              <p class="track-artist">🍄</p>
+            </div>
+
+            <div class="progress-area">
+              <div class="slider-track">
+                <input type="range" min="0" max="100" value="0" class="seek_slider" aria-label="Progreso de la canción">
+              </div>
+              <div class="time-labels">
+                <span class="current-time">00:00</span>
+                <span class="total-duration">00:00</span>
+              </div>
+            </div>
+
+            <div class="player-controls">
+              <button type="button" class="random-track control-button" aria-label="Activar reproducción aleatoria" title="Aleatorio">
+                <i class="fa-solid fa-shuffle"></i>
+              </button>
+              <button type="button" class="prev-track control-button" aria-label="Canción anterior" title="Anterior">
+                <i class="fa-solid fa-backward-step"></i>
+              </button>
+              <button type="button" class="playpause-track play-button" aria-label="Reproducir" title="Reproducir">
+                <i class="fa-solid fa-play"></i>
+              </button>
+              <button type="button" class="next-track control-button" aria-label="Siguiente canción" title="Siguiente">
+                <i class="fa-solid fa-forward-step"></i>
+              </button>
+              <button type="button" class="repeat-track control-button" aria-label="Repetir canción actual" title="Repetir canción">
+                <i class="fa-solid fa-repeat"></i>
+              </button>
+            </div>
+
+            <div class="volume-row">
+              <i class="fa-solid fa-volume-low" aria-hidden="true"></i>
+              <input type="range" min="0" max="100" value="75" class="volume_slider" aria-label="Volumen">
+              <i class="fa-solid fa-volume-high" aria-hidden="true"></i>
+            </div>
+            <p class="player-note"><i class="fa-regular fa-heart"></i> Reproducción en curso</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>Sin contexto :p</span>
+    </footer>
+  </main>
+</body>
+</html>
