@@ -36,19 +36,19 @@ const deviceClock = document.querySelector(".phone-status > span");
 
 function updateDeviceClock() {
 
-  if (!deviceClock) return;
+  if (!deviceClock) return;
 
-  const now = new Date();
+  const now = new Date();
 
-  deviceClock.textContent = new Intl.DateTimeFormat("es-CO", {
+  deviceClock.textContent = new Intl.DateTimeFormat("es-CO", {
 
-    hour: "numeric",
+    hour: "numeric",
 
-    minute: "2-digit",
+    minute: "2-digit",
 
-    hour12: true
+    hour12: true
 
-  }).format(now).replace(/\s/g, "").toLowerCase();
+  }).format(now).replace(/\s/g, "").toLowerCase();
 
 }
 
@@ -58,7 +58,7 @@ setInterval(updateDeviceClock, 15000);
 
 document.addEventListener("visibilitychange", () => {
 
-  if (!document.hidden) updateDeviceClock();
+  if (!document.hidden) updateDeviceClock();
 
 });
 
@@ -76,37 +76,37 @@ let gainNode = null;
 
 function prepareAudioBoost() {
 
-  if (gainNode) return;
+  if (gainNode) return;
 
-  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
 
-  if (!AudioContextClass) return;
+  if (!AudioContextClass) return;
 
-  try {
+  try {
 
-    audioContext = new AudioContextClass();
+    audioContext = new AudioContextClass();
 
-    trackSource = audioContext.createMediaElementSource(currentTrack);
+    trackSource = audioContext.createMediaElementSource(currentTrack);
 
-    gainNode = audioContext.createGain();
+    gainNode = audioContext.createGain();
 
-    trackSource.connect(gainNode);
+    trackSource.connect(gainNode);
 
-    gainNode.connect(audioContext.destination);
+    gainNode.connect(audioContext.destination);
 
-    setVolume();
+    setVolume();
 
-  } catch (error) {
+  } catch (error) {
 
-    console.warn("La amplificación adicional no está disponible en este navegador.", error);
+    console.warn("La amplificación adicional no está disponible en este navegador.", error);
 
-    audioContext = null;
+    audioContext = null;
 
-    trackSource = null;
+    trackSource = null;
 
-    gainNode = null;
+    gainNode = null;
 
-  }
+  }
 
 }
 
@@ -120,19 +120,19 @@ let isRepeat = false;
 
 const musicList = [
 
-  { img: "img/cafune.jpg", name: "Tek It (I Watch The Moon)", artist: "Cafuné", music: "music/Cafuné - Tek It (I Watch The Moon) [Official Video] - CAFUNÉ (128k).mp3", theme: ["#38556d", "#111c2c", "#9ab8d2"] },
+  { img: "img/cafune.jpg", name: "Tek It (I Watch The Moon)", artist: "Cafuné", music: "music/Cafuné - Tek It (I Watch The Moon) [Official Video] - CAFUNÉ (128k).mp3", theme: ["#38556d", "#111c2c", "#9ab8d2"] },
 
-  { img: "img/gg.jpg", name: "Espero no lo olvides", artist: "🍄", music: "music/Julieta Venegas - Eres para Mí (Video).mp3", theme: ["#b45491", "#251124", "#f3a3d1"] },
+  { img: "img/gg.jpg", name: "Espero no lo olvides", artist: "🍄", music: "music/Julieta Venegas - Eres para Mí (Video).mp3", theme: ["#b45491", "#251124", "#f3a3d1"] },
 
-  { img: "img/ev.jpg", name: "Coyote Theory", artist: "🍄", music: "music/Coyote Theory - This Side of Paradise (Lyric Video).mp3", theme: ["#5a6a92", "#111522", "#a7b8e5"] },
+  { img: "img/ev.jpg", name: "Coyote Theory", artist: "🍄", music: "music/Coyote Theory - This Side of Paradise (Lyric Video).mp3", theme: ["#5a6a92", "#111522", "#a7b8e5"] },
 
-  { img: "img/2.jpg", name: "Mi niña bonita", artist: "🍄", music: "music/Bonita- Andrés Cabas [Letra].mp3", theme: ["#c17c44", "#2a1711", "#f0bd82"] },
+  { img: "img/2.jpg", name: "Mi niña bonita", artist: "🍄", music: "music/Bonita- Andrés Cabas [Letra].mp3", theme: ["#c17c44", "#2a1711", "#f0bd82"] },
 
-  { img: "img/3.jpg", name: "Enamorado", artist: "🍄", music: "music/Enamorado - Los Aptos,Letra 🌹❤.mp3", theme: ["#a84955", "#271014", "#ee9da5"] },
+  { img: "img/3.jpg", name: "Enamorado", artist: "🍄", music: "music/Enamorado - Los Aptos,Letra 🌹❤.mp3", theme: ["#a84955", "#271014", "#ee9da5"] },
 
-  { img: "img/e.jpg", name: "Dandelions", artist: "🍄", music: "music/Ruth B. - Dandelions (Lyrics).mp3", theme: ["#b99a43", "#211d10", "#f0d783"] },
+  { img: "img/e.jpg", name: "Dandelions", artist: "🍄", music: "music/Ruth B. - Dandelions (Lyrics).mp3", theme: ["#b99a43", "#211d10", "#f0d783"] },
 
-  { img: "img/msg-765387767-131546.jpg", name: "Something About You", artist: "🍄", music: "music/Eyedress & Dent May - Something About You.mp3", theme: ["#4d927d", "#10231f", "#9ed9c6"] }
+  { img: "img/msg-765387767-131546.jpg", name: "Something About You", artist: "🍄", music: "music/Eyedress & Dent May - Something About You.mp3", theme: ["#4d927d", "#10231f", "#9ed9c6"] }
 
 ];
 
@@ -140,407 +140,407 @@ const musicList = [
 
 function animateChatMessages() {
 
-  const chat = document.querySelector(".texts");
+  const chat = document.querySelector(".texts");
 
-  const chatContent = document.querySelector(".chat-content");
+  const chatContent = document.querySelector(".chat-content");
 
-  if (!chat || !chatContent || chat.dataset.navigatorReady === "true") return;
+  if (!chat || !chatContent || chat.dataset.navigatorReady === "true") return;
 
-  chat.dataset.navigatorReady = "true";
+  chat.dataset.navigatorReady = "true";
 
-  /* Mensajes ANTIGUOS: los 17 textos que estaban originalmente en tu HTML. */
+  /* Mensajes ANTIGUOS: los 17 textos que estaban originalmente en tu HTML. */
 
-  const previousMessages = [
+  const previousMessages = [
 
-    "Holaaaaaaaa",
+    "Holaaaaaaaa",
 
-    "supongo que volviste a entrar",
+    "supongo que volviste a entrar",
 
-    "xd",
+    "xd",
 
-    "como lo dije antes, tengo mil cosas por decir...",
+    "como lo dije antes, tengo mil cosas por decir...",
 
-    "pero no sé, creo que estás decidida con tu pensamiento",
+    "pero no sé, creo que estás decidida con tu pensamiento",
 
-    "y no quiero molestarte",
+    "y no quiero molestarte",
 
-    'llegará el momento en el que ambos ya perdamos el "camino"',
+    'llegará el momento en el que ambos ya perdamos el "camino"',
 
-    "parece que ambos esperamos lo mismo del otro, pero ninguno da el paso",
+    "parece que ambos esperamos lo mismo del otro, pero ninguno da el paso",
 
-    "o eso creo jajaja",
+    "o eso creo jajaja",
 
-    "y puejj",
+    "y puejj",
 
-    "🤔",
+    "🤔",
 
-    "supongo que somos víctimas de nuestra mente",
+    "supongo que somos víctimas de nuestra mente",
 
-    "y por último puessss acá quedarán algunos de nuestros cortos momentos",
+    "y por último puessss acá quedarán algunos de nuestros cortos momentos",
 
-    "quizás en un futuro hasta hablemos de esto",
+    "quizás en un futuro hasta hablemos de esto",
 
-    "Depende de nosotros...",
+    "Depende de nosotros...",
 
-    "espero entres aquí y escuches algunas de nuestras rolitas, posiblemente también lo esté haciendo",
+    "espero entres aquí y escuches algunas de nuestras rolitas, posiblemente también lo esté haciendo",
 
-    "y por sí acaso sigue bajando panzona 👇"
+    "y por sí acaso sigue bajando panzona 👇"
 
-  ];
+  ];
 
-  /* Mensajes NUEVOS: aparecen al pulsar "Ver mensajes nuevos". */
+  /* Mensajes NUEVOS: aparecen al pulsar "Ver mensajes nuevos". */
 
-  const latestMessages = [
+  const latestMessages = [
 
-    "Holap",
+    "Holap",
 
-    "Una pequeña actualizacion",
+    "Una pequeña actualizacion",
 
-    "Te odio estafadora"
+    "Te odio estafadora"
 
-  ];
+  ];
 
-  let currentView = "new";
+  let currentView = "new";
 
-  let animationTimer = null;
+  let animationTimer = null;
 
-  /* Barra discreta integrada al chat, sin depender del estilo global de los botones. */
+  /* Barra discreta integrada al chat, sin depender del estilo global de los botones. */
 
-  const navigation = document.createElement("div");
+  const navigation = document.createElement("div");
 
-  navigation.className = "chat-message-navigation";
+  navigation.className = "chat-message-navigation";
 
-  const previousButton = document.createElement("button");
+  const previousButton = document.createElement("button");
 
-  previousButton.type = "button";
+  previousButton.type = "button";
 
-  previousButton.className = "chat-message-toggle";
+  previousButton.className = "chat-message-toggle";
 
-  previousButton.innerHTML = '<i class="fa-solid fa-chevron-up" aria-hidden="true"></i><span>Ver mensajes anteriores</span>';
+  previousButton.innerHTML = '<i class="fa-solid fa-chevron-up" aria-hidden="true"></i><span>Ver mensajes anteriores</span>';
 
-  previousButton.setAttribute("aria-label", "Ver mensajes anteriores");
+  previousButton.setAttribute("aria-label", "Ver mensajes anteriores");
 
-  const newButton = document.createElement("button");
+  const newButton = document.createElement("button");
 
-  newButton.type = "button";
+  newButton.type = "button";
 
-  newButton.className = "chat-message-toggle";
+  newButton.className = "chat-message-toggle";
 
-  newButton.innerHTML = '<i class="fa-solid fa-chevron-down" aria-hidden="true"></i><span>Ver mensajes nuevos</span>';
+  newButton.innerHTML = '<i class="fa-solid fa-chevron-down" aria-hidden="true"></i><span>Ver mensajes nuevos</span>';
 
-  newButton.setAttribute("aria-label", "Ver mensajes nuevos");
+  newButton.setAttribute("aria-label", "Ver mensajes nuevos");
 
-  newButton.hidden = true;
+  newButton.hidden = true;
 
-  navigation.append(previousButton, newButton);
+  navigation.append(previousButton, newButton);
 
-  chatContent.insertBefore(navigation, chat);
+  chatContent.insertBefore(navigation, chat);
 
-  if (!document.getElementById("chat-message-navigation-styles")) {
+  if (!document.getElementById("chat-message-navigation-styles")) {
 
-    const style = document.createElement("style");
+    const style = document.createElement("style");
 
-    style.id = "chat-message-navigation-styles";
+    style.id = "chat-message-navigation-styles";
 
-    style.textContent = `
+    style.textContent = `
 
-      .chat-message-navigation {
+      .chat-message-navigation {
 
-        box-sizing: border-box !important;
+        box-sizing: border-box !important;
 
-        display: flex !important;
+        display: flex !important;
 
-        justify-content: center !important;
+        justify-content: center !important;
 
-        align-items: center !important;
+        align-items: center !important;
 
-        flex: 0 0 auto !important;
+        flex: 0 0 auto !important;
 
-        width: 100% !important;
+        width: 100% !important;
 
-        padding: 7px 10px !important;
+        padding: 7px 10px !important;
 
-        background: #f8f3f7 !important;
+        background: #f8f3f7 !important;
 
-        border-top: 1px solid #eee2eb !important;
+        border-top: 1px solid #eee2eb !important;
 
-        border-bottom: 1px solid #eee2eb !important;
+        border-bottom: 1px solid #eee2eb !important;
 
-      }
+      }
 
-      .chat-message-navigation .chat-message-toggle {
+      .chat-message-navigation .chat-message-toggle {
 
-        box-sizing: border-box !important;
+        box-sizing: border-box !important;
 
-        display: inline-flex !important;
+        display: inline-flex !important;
 
-        align-items: center !important;
+        align-items: center !important;
 
-        justify-content: center !important;
+        justify-content: center !important;
 
-        gap: 8px !important;
+        gap: 8px !important;
 
-        max-width: 100% !important;
+        max-width: 100% !important;
 
-        min-height: 30px !important;
+        min-height: 30px !important;
 
-        margin: 0 auto !important;
+        margin: 0 auto !important;
 
-        padding: 7px 14px !important;
+        padding: 7px 14px !important;
 
-        border: 1px solid #e7c4d9 !important;
+        border: 1px solid #e7c4d9 !important;
 
-        border-radius: 999px !important;
+        border-radius: 999px !important;
 
-        background: linear-gradient(135deg, #fff 0%, #fff7fb 100%) !important;
+        background: linear-gradient(135deg, #fff 0%, #fff7fb 100%) !important;
 
-        color: #a44d80 !important;
+        color: #a44d80 !important;
 
-        box-shadow: 0 2px 8px rgba(133, 66, 105, .10) !important;
+        box-shadow: 0 2px 8px rgba(133, 66, 105, .10) !important;
 
-        font-family: "DM Sans", sans-serif !important;
+        font-family: "DM Sans", sans-serif !important;
 
-        font-size: 10px !important;
+        font-size: 10px !important;
 
-        font-weight: 700 !important;
+        font-weight: 700 !important;
 
-        line-height: 1.2 !important;
+        line-height: 1.2 !important;
 
-        letter-spacing: .01em !important;
+        letter-spacing: .01em !important;
 
-        text-align: center !important;
+        text-align: center !important;
 
-        white-space: nowrap !important;
+        white-space: nowrap !important;
 
-        cursor: pointer !important;
+        cursor: pointer !important;
 
-        appearance: none !important;
+        appearance: none !important;
 
-        -webkit-appearance: none !important;
+        -webkit-appearance: none !important;
 
-        transition: background .18s ease, transform .18s ease, box-shadow .18s ease !important;
+        transition: background .18s ease, transform .18s ease, box-shadow .18s ease !important;
 
-      }
+      }
 
-      .chat-message-navigation .chat-message-toggle:hover {
+      .chat-message-navigation .chat-message-toggle:hover {
 
-        background: #ffedf6 !important;
+        background: #ffedf6 !important;
 
-        box-shadow: 0 3px 10px rgba(133, 66, 105, .15) !important;
+        box-shadow: 0 3px 10px rgba(133, 66, 105, .15) !important;
 
-      }
+      }
 
-      .chat-message-navigation .chat-message-toggle:active {
+      .chat-message-navigation .chat-message-toggle:active {
 
-        transform: scale(.98) !important;
+        transform: scale(.98) !important;
 
-      }
+      }
 
-      .chat-message-navigation .chat-message-toggle[hidden] {
+      .chat-message-navigation .chat-message-toggle[hidden] {
 
-        display: none !important;
+        display: none !important;
 
-      }
+      }
 
-      .texts .text {
+      .texts .text {
 
-        box-sizing: border-box;
+        box-sizing: border-box;
 
-        flex: 0 0 auto;
+        flex: 0 0 auto;
 
-        max-width: 90%;
+        max-width: 90%;
 
-        white-space: normal;
+        white-space: normal;
 
-        overflow-wrap: anywhere;
+        overflow-wrap: anywhere;
 
-      }
+      }
 
-      @media (max-width: 480px) {
+      @media (max-width: 480px) {
 
-        .chat-message-navigation { padding: 6px 7px !important; }
+        .chat-message-navigation { padding: 6px 7px !important; }
 
-        .chat-message-navigation .chat-message-toggle {
+        .chat-message-navigation .chat-message-toggle {
 
-          min-height: 28px !important;
+          min-height: 28px !important;
 
-          padding: 6px 11px !important;
+          padding: 6px 11px !important;
 
-          font-size: 9px !important;
+          font-size: 9px !important;
 
-        }
+        }
 
-      }
+      }
 
-    `;
+    `;
 
-    document.head.appendChild(style);
+    document.head.appendChild(style);
 
-  }
+  }
 
-  function clearAnimation() {
+  function clearAnimation() {
 
-    if (animationTimer !== null) {
+    if (animationTimer !== null) {
 
-      window.clearTimeout(animationTimer);
+      window.clearTimeout(animationTimer);
 
-      animationTimer = null;
+      animationTimer = null;
 
-    }
+    }
 
-  }
+  }
 
-  function renderMessages(messages, view) {
+  function renderMessages(messages, view) {
 
-    clearAnimation();
+    clearAnimation();
 
-    currentView = view;
+    currentView = view;
 
-    chat.replaceChildren();
+    chat.replaceChildren();
 
-    const spacer = document.createElement("div");
+    const spacer = document.createElement("div");
 
-    spacer.className = "blocker";
+    spacer.className = "blocker";
 
-    spacer.setAttribute("aria-hidden", "true");
+    spacer.setAttribute("aria-hidden", "true");
 
-    spacer.style.setProperty("flex", "0 0 4px");
+    spacer.style.setProperty("flex", "0 0 4px");
 
-    spacer.style.setProperty("height", "4px");
+    spacer.style.setProperty("height", "4px");
 
-    chat.appendChild(spacer);
+    chat.appendChild(spacer);
 
-    const bubbles = messages.map(text => {
+    const bubbles = messages.map(text => {
 
-      const bubble = document.createElement("div");
+      const bubble = document.createElement("div");
 
-      bubble.className = "text";
+      bubble.className = "text";
 
-      bubble.textContent = text;
+      bubble.textContent = text;
 
-      bubble.style.setProperty("display", "none", "important");
+      bubble.style.setProperty("display", "none", "important");
 
-      bubble.style.opacity = "0";
+      bubble.style.opacity = "0";
 
-      chat.appendChild(bubble);
+      chat.appendChild(bubble);
 
-      return bubble;
+      return bubble;
 
-    });
+    });
 
-    previousButton.hidden = view === "previous";
+    previousButton.hidden = view === "previous";
 
-    newButton.hidden = view === "new";
+    newButton.hidden = view === "new";
 
-    let index = 0;
+    let index = 0;
 
-    function revealNext() {
+    function revealNext() {
 
-      if (index >= bubbles.length) {
+      if (index >= bubbles.length) {
 
-        animationTimer = null;
+        animationTimer = null;
 
-        return;
+        return;
 
-      }
+      }
 
-      const bubble = bubbles[index++];
+      const bubble = bubbles[index++];
 
-      /* !important evita que reglas antiguas del CSS oculten las burbujas. */
+      /* !important evita que reglas antiguas del CSS oculten las burbujas. */
 
-      bubble.style.setProperty("display", "block", "important");
+      bubble.style.setProperty("display", "block", "important");
 
-      bubble.style.opacity = "0";
+      bubble.style.opacity = "0";
 
-      bubble.style.transition = "opacity 240ms ease";
+      bubble.style.transition = "opacity 240ms ease";
 
-      requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
 
-        bubble.style.opacity = "1";
+        bubble.style.opacity = "1";
 
-        chat.scrollTop = chat.scrollHeight;
+        chat.scrollTop = chat.scrollHeight;
 
-      });
+      });
 
-      if (index < bubbles.length) {
+      if (index < bubbles.length) {
 
-        animationTimer = window.setTimeout(revealNext, 1200);
+        animationTimer = window.setTimeout(revealNext, 1200);
 
-      } else {
+      } else {
 
-        animationTimer = window.setTimeout(() => {
+        animationTimer = window.setTimeout(() => {
 
-          chat.scrollTop = chat.scrollHeight;
+          chat.scrollTop = chat.scrollHeight;
 
-          animationTimer = null;
+          animationTimer = null;
 
-        }, 260);
+        }, 260);
 
-      }
+      }
 
-    }
+    }
 
-    animationTimer = window.setTimeout(revealNext, 180);
+    animationTimer = window.setTimeout(revealNext, 180);
 
-  }
+  }
 
-  previousButton.addEventListener("click", () => {
+  previousButton.addEventListener("click", () => {
 
-    if (currentView !== "previous") renderMessages(previousMessages, "previous");
+    if (currentView !== "previous") renderMessages(previousMessages, "previous");
 
-  });
+  });
 
-  newButton.addEventListener("click", () => {
+  newButton.addEventListener("click", () => {
 
-    if (currentView !== "new") renderMessages(latestMessages, "new");
+    if (currentView !== "new") renderMessages(latestMessages, "new");
 
-  });
+  });
 
-  renderMessages(latestMessages, "new");
+  renderMessages(latestMessages, "new");
 
 }
 
 function formatTime(seconds) {
 
-  if (!Number.isFinite(seconds) || seconds < 0) return "00:00";
+  if (!Number.isFinite(seconds) || seconds < 0) return "00:00";
 
-  const minutes = Math.floor(seconds / 60);
+  const minutes = Math.floor(seconds / 60);
 
-  const remainingSeconds = Math.floor(seconds % 60);
+  const remainingSeconds = Math.floor(seconds % 60);
 
-  return `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
+  return `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
 
 }
 
 function updatePlayButton() {
 
-  if (!playPauseButton) return;
+  if (!playPauseButton) return;
 
-  playPauseButton.innerHTML = isPlaying
+  playPauseButton.innerHTML = isPlaying
 
-    ? '<i class="fa-solid fa-pause"></i>'
+    ? '<i class="fa-solid fa-pause"></i>'
 
-    : '<i class="fa-solid fa-play"></i>';
+    : '<i class="fa-solid fa-play"></i>';
 
-  playPauseButton.setAttribute("aria-label", isPlaying ? "Pausar" : "Reproducir");
+  playPauseButton.setAttribute("aria-label", isPlaying ? "Pausar" : "Reproducir");
 
-  playPauseButton.setAttribute("title", isPlaying ? "Pausar" : "Reproducir");
+  playPauseButton.setAttribute("title", isPlaying ? "Pausar" : "Reproducir");
 
-  trackArt?.classList.toggle("rotate", isPlaying);
+  trackArt?.classList.toggle("rotate", isPlaying);
 
-  wave?.classList.toggle("loader", isPlaying);
+  wave?.classList.toggle("loader", isPlaying);
 
 }
 
 function updateModeButtons() {
 
-  randomButton?.classList.toggle("active", isRandom);
+  randomButton?.classList.toggle("active", isRandom);
 
-  randomButton?.setAttribute("aria-pressed", String(isRandom));
+  randomButton?.setAttribute("aria-pressed", String(isRandom));
 
-  repeatButton?.classList.toggle("active", isRepeat);
+  repeatButton?.classList.toggle("active", isRepeat);
 
-  repeatButton?.setAttribute("aria-pressed", String(isRepeat));
+  repeatButton?.setAttribute("aria-pressed", String(isRepeat));
 
 }
 
@@ -548,233 +548,235 @@ function updateModeButtons() {
 
 function applyTrackTheme(track) {
 
-  if (!track) return;
+  if (!track) return;
 
-  const playerCard = document.querySelector(".player-card");
+  const playerCard = document.querySelector(".player-card");
 
-  const [glow, deep, accent] = track.theme || ["#b45491", "#17101f", "#f3a3d1"];
+  const [glow, deep, accent] = track.theme || ["#b45491", "#17101f", "#f3a3d1"];
 
-  const root = document.documentElement;
+  const root = document.documentElement;
 
-  root.style.setProperty("--song-glow", glow);
+  root.style.setProperty("--song-glow", glow);
 
-  root.style.setProperty("--song-deep", deep);
+  root.style.setProperty("--song-deep", deep);
 
-  root.style.setProperty("--song-accent", accent);
+  root.style.setProperty("--song-accent", accent);
 
   // Activa el tema global cuando comienza la reproducción.
+
   document.body?.setAttribute("data-song-theme", track.name);
 
-  if (playerCard) {
+  if (playerCard) {
 
-    playerCard.style.setProperty("--song-glow", glow);
+    playerCard.style.setProperty("--song-glow", glow);
 
-    playerCard.style.setProperty("--song-deep", deep);
+    playerCard.style.setProperty("--song-deep", deep);
 
-    playerCard.style.setProperty("--song-accent", accent);
+    playerCard.style.setProperty("--song-accent", accent);
 
-    playerCard.setAttribute("data-song-theme", track.name);
+    playerCard.setAttribute("data-song-theme", track.name);
 
-  }
+  }
 
 }
 
 function loadTrack(index) {
 
-  if (!musicList.length) return;
+  if (!musicList.length) return;
 
-  trackIndex = (index + musicList.length) % musicList.length;
+  trackIndex = (index + musicList.length) % musicList.length;
 
-  const track = musicList[trackIndex];
+  const track = musicList[trackIndex];
 
-  // El tema no se aplica al seleccionar; solo se activa al pulsar Play.
+  // El tema no se aplica al seleccionar; solo se activa al pulsar Play.
 
-  currentTrack.pause();
+  currentTrack.pause();
 
-  currentTrack.loop = isRepeat;
+  currentTrack.loop = isRepeat;
 
-  currentTrack.src = track.music;
+  currentTrack.src = track.music;
 
-  currentTrack.load();
+  currentTrack.load();
 
-  if (trackArt) {
+  if (trackArt) {
 
-    trackArt.style.backgroundImage = `url("${track.img}")`;
+    trackArt.style.backgroundImage = `url("${track.img}")`;
 
-    trackArt.setAttribute("aria-label", `Portada de ${track.name}`);
+    trackArt.setAttribute("aria-label", `Portada de ${track.name}`);
 
-  }
+  }
 
-  if (trackName) {
+  if (trackName) {
 
-    trackName.textContent = track.name;
+    trackName.textContent = track.name;
 
-    trackName.removeAttribute("title");
+    trackName.removeAttribute("title");
 
-  }
+  }
 
-  if (trackArtist) trackArtist.textContent = track.artist;
+  if (trackArtist) trackArtist.textContent = track.artist;
 
-  if (nowPlaying) {
+  if (nowPlaying) {
 
-    nowPlaying.textContent = `CANCIÓN ${String(trackIndex + 1).padStart(2, "0")} DE ${String(musicList.length).padStart(2, "0")}`;
+    nowPlaying.textContent = `CANCIÓN ${String(trackIndex + 1).padStart(2, "0")} DE ${String(musicList.length).padStart(2, "0")}`;
 
-  }
+  }
 
-  if (seekSlider) seekSlider.value = "0";
+  if (seekSlider) seekSlider.value = "0";
 
-  if (currentTimeLabel) currentTimeLabel.textContent = "00:00";
+  if (currentTimeLabel) currentTimeLabel.textContent = "00:00";
 
-  if (totalDurationLabel) totalDurationLabel.textContent = "00:00";
+  if (totalDurationLabel) totalDurationLabel.textContent = "00:00";
 
-  isPlaying = false;
+  isPlaying = false;
 
-  updatePlayButton();
+  updatePlayButton();
 
 }
 
 async function playTrack() {
 
-  try {
+  try {
 
-    prepareAudioBoost();
+    prepareAudioBoost();
 
-    if (audioContext?.state === "suspended") await audioContext.resume();
+    if (audioContext?.state === "suspended") await audioContext.resume();
 
-    await currentTrack.play();
+    await currentTrack.play();
 
     // Cambia los colores solo después de iniciar el audio.
+
     applyTrackTheme(musicList[trackIndex]);
 
-    isPlaying = true;
+    isPlaying = true;
 
-    updatePlayButton();
+    updatePlayButton();
 
-  } catch (error) {
+  } catch (error) {
 
-    isPlaying = false;
+    isPlaying = false;
 
-    updatePlayButton();
+    updatePlayButton();
 
-    console.warn("No se pudo reproducir la canción. Revisa que la ruta del archivo sea correcta.", error);
+    console.warn("No se pudo reproducir la canción. Revisa que la ruta del archivo sea correcta.", error);
 
-  }
+  }
 
 }
 
 function pauseTrack() {
 
-  currentTrack.pause();
+  currentTrack.pause();
 
-  isPlaying = false;
+  isPlaying = false;
 
-  updatePlayButton();
+  updatePlayButton();
 
 }
 
 function playPauseTrack() {
 
-  if (isPlaying) pauseTrack();
+  if (isPlaying) pauseTrack();
 
-  else playTrack();
+  else playTrack();
 
 }
 
 function getNextRandomIndex() {
 
-  if (musicList.length < 2) return trackIndex;
+  if (musicList.length < 2) return trackIndex;
 
-  let nextIndex = trackIndex;
+  let nextIndex = trackIndex;
 
-  while (nextIndex === trackIndex) nextIndex = Math.floor(Math.random() * musicList.length);
+  while (nextIndex === trackIndex) nextIndex = Math.floor(Math.random() * musicList.length);
 
-  return nextIndex;
+  return nextIndex;
 
 }
 
 function nextTrack() {
 
-  const nextIndex = isRandom ? getNextRandomIndex() : (trackIndex + 1) % musicList.length;
+  const nextIndex = isRandom ? getNextRandomIndex() : (trackIndex + 1) % musicList.length;
 
-  loadTrack(nextIndex);
+  loadTrack(nextIndex);
 
-  playTrack();
+  playTrack();
 
 }
 
 function previousTrack() {
 
-  if (currentTrack.currentTime > 3) {
+  if (currentTrack.currentTime > 3) {
 
-    currentTrack.currentTime = 0;
+    currentTrack.currentTime = 0;
 
-    return;
+    return;
 
-  }
+  }
 
-  const previousIndex = (trackIndex - 1 + musicList.length) % musicList.length;
+  const previousIndex = (trackIndex - 1 + musicList.length) % musicList.length;
 
-  loadTrack(previousIndex);
+  loadTrack(previousIndex);
 
-  playTrack();
+  playTrack();
 
 }
 
 function toggleRandom() {
 
-  isRandom = !isRandom;
+  isRandom = !isRandom;
 
-  updateModeButtons();
+  updateModeButtons();
 
 }
 
 function toggleRepeat() {
 
-  isRepeat = !isRepeat;
+  isRepeat = !isRepeat;
 
-  currentTrack.loop = isRepeat;
+  currentTrack.loop = isRepeat;
 
-  updateModeButtons();
+  updateModeButtons();
 
 }
 
 function seekTo() {
 
-  if (!Number.isFinite(currentTrack.duration) || currentTrack.duration <= 0 || !seekSlider) return;
+  if (!Number.isFinite(currentTrack.duration) || currentTrack.duration <= 0 || !seekSlider) return;
 
-  currentTrack.currentTime = currentTrack.duration * (Number(seekSlider.value) / 100);
+  currentTrack.currentTime = currentTrack.duration * (Number(seekSlider.value) / 100);
 
 }
 
 function setVolume() {
 
-  if (!volumeSlider) return;
+  if (!volumeSlider) return;
 
-  const sliderValue = Math.max(0, Math.min(100, Number(volumeSlider.value))) / 100;
+  const sliderValue = Math.max(0, Math.min(100, Number(volumeSlider.value))) / 100;
 
-  if (gainNode) {
+  if (gainNode) {
 
-    gainNode.gain.value = sliderValue * 1.35;
+    gainNode.gain.value = sliderValue * 1.35;
 
-    currentTrack.volume = 1;
+    currentTrack.volume = 1;
 
-  } else {
+  } else {
 
-    currentTrack.volume = sliderValue;
+    currentTrack.volume = sliderValue;
 
-  }
+  }
 
 }
 
 function updateProgress() {
 
-  if (!Number.isFinite(currentTrack.duration) || currentTrack.duration <= 0) return;
+  if (!Number.isFinite(currentTrack.duration) || currentTrack.duration <= 0) return;
 
-  if (seekSlider) seekSlider.value = String((currentTrack.currentTime / currentTrack.duration) * 100);
+  if (seekSlider) seekSlider.value = String((currentTrack.currentTime / currentTrack.duration) * 100);
 
-  if (currentTimeLabel) currentTimeLabel.textContent = formatTime(currentTrack.currentTime);
+  if (currentTimeLabel) currentTimeLabel.textContent = formatTime(currentTrack.currentTime);
 
-  if (totalDurationLabel) totalDurationLabel.textContent = formatTime(currentTrack.duration);
+  if (totalDurationLabel) totalDurationLabel.textContent = formatTime(currentTrack.duration);
 
 }
 
@@ -798,53 +800,53 @@ currentTrack.addEventListener("loadedmetadata", updateProgress);
 
 currentTrack.addEventListener("ended", () => {
 
-  if (isRepeat) return;
+  if (isRepeat) return;
 
-  if (isRandom) {
+  if (isRandom) {
 
-    loadTrack(getNextRandomIndex());
+    loadTrack(getNextRandomIndex());
 
-    playTrack();
+    playTrack();
 
-  } else if (trackIndex < musicList.length - 1) {
+  } else if (trackIndex < musicList.length - 1) {
 
-    nextTrack();
+    nextTrack();
 
-  } else {
+  } else {
 
-    pauseTrack();
+    pauseTrack();
 
-    currentTrack.currentTime = 0;
+    currentTrack.currentTime = 0;
 
-    if (seekSlider) seekSlider.value = "0";
+    if (seekSlider) seekSlider.value = "0";
 
-    if (currentTimeLabel) currentTimeLabel.textContent = "00:00";
+    if (currentTimeLabel) currentTimeLabel.textContent = "00:00";
 
-  }
+  }
 
 });
 
 currentTrack.addEventListener("play", () => {
 
-  isPlaying = true;
+  isPlaying = true;
 
-  updatePlayButton();
+  updatePlayButton();
 
 });
 
 currentTrack.addEventListener("pause", () => {
 
-  isPlaying = false;
+  isPlaying = false;
 
-  updatePlayButton();
+  updatePlayButton();
 
 });
 
 currentTrack.addEventListener("error", () => {
 
-  console.warn(`No se pudo cargar el audio: ${musicList[trackIndex].music}. Comprueba el nombre y la ubicación del archivo.`);
+  console.warn(`No se pudo cargar el audio: ${musicList[trackIndex].music}. Comprueba el nombre y la ubicación del archivo.`);
 
-  if (trackName) trackName.title = "No se pudo cargar el audio. Revisa el nombre del archivo y su ruta.";
+  if (trackName) trackName.title = "No se pudo cargar el audio. Revisa el nombre del archivo y su ruta.";
 
 });
 
@@ -858,10 +860,40 @@ setVolume();
 
 if (document.readyState === "loading") {
 
-  document.addEventListener("DOMContentLoaded", animateChatMessages, { once: true });
+  document.addEventListener("DOMContentLoaded", animateChatMessages, { once: true });
 
 } else {
 
-  animateChatMessages();
+  animateChatMessages();
 
+}
+
+
+/* Carta sorpresa: muestra solo el mensaje fijo y permite abrir/cerrar la tarjeta. */
+function initLetter() {
+  const toggle = document.querySelector(".letter-toggle");
+  const card = document.querySelector(".letter-card");
+  if (!toggle || !card) return;
+
+  toggle.addEventListener("click", () => {
+    const willOpen = card.hidden;
+    card.hidden = !willOpen;
+    toggle.setAttribute("aria-expanded", String(willOpen));
+    toggle.innerHTML = willOpen
+      ? '<i class="fa-solid fa-envelope-open" aria-hidden="true"></i> Cerrar cartita'
+      : '<i class="fa-regular fa-envelope" aria-hidden="true"></i> Ver mensaje…..';
+
+    if (willOpen) {
+      card.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+        block: "center"
+      });
+    }
+  });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initLetter, { once: true });
+} else {
+  initLetter();
 }

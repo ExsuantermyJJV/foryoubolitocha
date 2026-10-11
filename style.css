@@ -709,502 +709,1061 @@ button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid 
 }
 
 /* MENSAJES: burbujas centradas, texto legible alineado a la izquierda */
+
 .texts {
+
   align-items: center;
+
   justify-content: flex-end;
+
 }
 
 .texts .text {
+
   align-self: center;
+
   width: fit-content;
+
   max-width: 88%;
+
   margin-left: auto;
+
   margin-right: auto;
+
   text-align: left;
+
 }
 
 /* El bloque inicial no debe crear un hueco grande encima de los mensajes */
+
 .texts .blocker {
+
   height: 6px;
+
   flex: 0 0 6px;
+
 }
 
 @media (max-width: 700px) {
+
   .texts {
+
     align-items: center;
+
   }
 
   .texts .text {
+
     max-width: 88%;
+
   }
+
 }
 
 /* FIX FINAL: encabezados de sección y scroll interno del teléfono */
 
 /* No altera los encabezados de la página: solo afecta a las burbujas del chat */
+
 .texts {
+
   display: flex;
+
   flex: 1 1 0;
+
   min-height: 0;
+
   flex-direction: column;
+
   align-items: stretch;
+
   justify-content: flex-end;
+
   gap: 4px;
+
   overflow-x: hidden;
+
   overflow-y: auto;
+
   overscroll-behavior-y: contain;
+
   -webkit-overflow-scrolling: touch;
+
   touch-action: pan-y;
+
   scroll-behavior: auto;
+
 }
 
 /* Conserva la alineación original de los mensajes hacia la derecha */
+
 .texts .text {
+
   align-self: flex-end;
+
   flex: 0 0 auto;
+
   max-width: 90%;
+
   margin: 0;
+
   text-align: left;
+
   opacity: 1;
+
   transform: none;
+
   animation: none;
+
 }
 
 /* El espacio inicial ya no ocupa 100px: el scroll solo aparece si hace falta */
+
 .texts .blocker {
+
   width: 100%;
+
   height: 8px;
+
   flex: 0 0 8px;
+
 }
 
 /* Desplazamiento táctil sin barra visible en móviles */
+
 @media (max-width: 700px) {
+
   .texts {
+
     scrollbar-width: none;
+
     padding-top: 4px;
+
     padding-bottom: 10px;
+
   }
 
   .texts::-webkit-scrollbar {
+
     display: none;
+
   }
 
   .texts .text {
+
     max-width: 90%;
+
   }
 
   .texts .blocker {
+
     height: 6px;
+
     flex-basis: 6px;
+
   }
+
 }
 
 /* Encabezados de sección centrados: Mensajes y Reproductor musical */
+
 .memory-section > .section-heading,
+
 .music-section > .section-heading {
+
   justify-content: center;
+
   text-align: center;
+
   flex-wrap: wrap;
+
 }
 
 .memory-section > .section-heading .section-index,
+
 .music-section > .section-heading .section-index {
+
   flex: 0 0 100%;
+
   text-align: center;
+
 }
 
 .memory-section > .section-heading .section-line,
+
 .music-section > .section-heading .section-line {
+
   display: none;
+
 }
 
 .memory-section > .section-title,
+
 .music-section > .section-title {
+
   text-align: center;
+
 }
 
 /* Chat: mensajes recibidos alineados a la izquierda, como en WhatsApp */
+
 .texts {
+
   display: flex;
+
   min-height: 0;
+
   flex: 1 1 0;
+
   flex-direction: column;
+
   align-items: stretch;
+
   justify-content: flex-end;
+
   gap: 4px;
+
   overflow-x: hidden;
+
   overflow-y: auto;
+
   overscroll-behavior-y: contain;
+
   -webkit-overflow-scrolling: touch;
+
   touch-action: pan-y;
+
   scroll-behavior: auto;
+
 }
 
 .texts .text {
+
   align-self: flex-start;
+
   flex: 0 0 auto;
+
   max-width: 88%;
+
   margin: 0;
+
   border-radius: 13px 13px 13px 4px;
+
   text-align: left;
+
   opacity: 1;
+
   transform: none;
+
   animation: none;
+
 }
 
 /* Elimina el gran hueco antes de la conversación */
+
 .texts .blocker {
+
   width: 100%;
+
   height: 6px;
+
   flex: 0 0 6px;
+
 }
 
 /* Indicador de escritura antes de mostrar los mensajes */
+
 .typing-indicator {
+
   display: flex;
+
   align-self: flex-start;
+
   align-items: center;
+
   gap: 4px;
+
   width: fit-content;
+
   margin: 2px 0 5px;
+
   padding: 9px 12px;
+
   border-radius: 13px 13px 13px 4px;
+
   background: #eee5ed;
+
 }
 
 .typing-indicator span {
+
   width: 5px;
+
   height: 5px;
+
   border-radius: 50%;
+
   background: #a66b94;
+
   animation: typing-bounce 1s infinite ease-in-out;
+
 }
 
 .typing-indicator span:nth-child(2) { animation-delay: .15s; }
+
 .typing-indicator span:nth-child(3) { animation-delay: .3s; }
 
 @keyframes typing-bounce {
+
   0%, 60%, 100% { transform: translateY(0); opacity: .5; }
+
   30% { transform: translateY(-4px); opacity: 1; }
+
 }
 
 @media (max-width: 700px) {
+
   .memory-section > .section-heading,
+
   .music-section > .section-heading {
+
     align-items: center;
+
   }
 
   .texts {
+
     scrollbar-width: none;
+
     padding-top: 4px;
+
     padding-bottom: 10px;
+
   }
 
   .texts::-webkit-scrollbar { display: none; }
 
   .texts .text { max-width: 90%; }
+
 }
 
 /* Ajustes finales de chat y alineación, conservados sin repetir el CSS base. */
 
 /* FIX SOLO PARA EL SCROLL DEL CHAT: permite subir a los mensajes anteriores */
+
 .phone-screen {
+
   min-height: 0;
+
   overflow: hidden;
+
 }
 
 .chat-content {
+
   display: flex;
+
   flex: 1 1 auto;
+
   min-height: 0;
+
   flex-direction: column;
+
   overflow: hidden;
+
 }
 
 .texts {
+
   display: flex;
+
   flex: 1 1 0;
+
   min-height: 0;
+
   max-height: 100%;
+
   flex-direction: column;
+
   overflow-x: hidden;
+
   overflow-y: auto !important;
+
   overscroll-behavior-y: contain;
+
   -webkit-overflow-scrolling: touch;
+
   touch-action: pan-y;
+
   scroll-behavior: auto;
+
   scrollbar-width: thin;
+
 }
 
 .texts .text {
+
   flex: 0 0 auto;
+
 }
 
 @media (max-width: 700px) {
+
   .texts {
+
     overflow-y: auto !important;
+
     touch-action: pan-y;
+
     overscroll-behavior: contain;
+
     scrollbar-width: none;
+
   }
 
   .texts::-webkit-scrollbar {
+
     display: none;
+
   }
+
 }
+
 /* PARCHE FINAL — centrado del bloque musical + scroll real del chat */
 
 /* 1) El bloque del reproductor queda alineado de forma consistente */
+
 .music-section > .section-heading,
+
 .music-section > .section-title,
+
 .music-section > p,
+
 .music-section > .section-description {
+
   text-align: center;
+
 }
 
 .music-section > .section-heading {
+
   justify-content: center;
+
 }
 
 .music-section > .section-heading .section-index {
+
   text-align: center;
+
 }
 
 .music-section > .section-heading .section-line {
+
   display: none;
+
 }
 
 /* Centra también el subtítulo que dice “Seis canciones en una sola playlist.” */
+
 .music-section > p,
+
 .music-section > .section-description {
+
   margin-left: auto;
+
   margin-right: auto;
+
 }
 
 /* 2) El teléfono debe tener una altura limitada; el scroll vive en .texts */
+
 .phone-screen {
+
   display: flex;
+
   flex-direction: column;
+
   min-height: 0;
+
   overflow: hidden;
+
 }
 
 .chat-content {
+
   display: flex;
+
   flex: 1 1 auto;
+
   flex-direction: column;
+
   min-height: 0;
+
   overflow: hidden;
+
 }
 
 /* Área real desplazable de los mensajes */
+
 .texts {
+
   display: flex;
+
   flex: 1 1 0%;
+
   min-height: 0;
+
   height: 0;
+
   max-height: 100%;
+
   flex-direction: column;
+
   justify-content: flex-end;
+
   align-items: stretch;
+
   overflow-x: hidden !important;
+
   overflow-y: auto !important;
+
   overscroll-behavior-y: contain;
+
   -webkit-overflow-scrolling: touch;
+
   touch-action: pan-y;
+
   scroll-behavior: auto;
+
 }
 
 /* Mensajes recibidos: a la izquierda, sin cortar el texto */
+
 .texts .text {
+
   align-self: flex-start;
+
   flex: 0 0 auto;
+
   max-width: 88%;
+
   width: fit-content;
+
   white-space: normal;
+
   overflow-wrap: anywhere;
+
   word-break: normal;
+
 }
 
 /* Evita que un separador cree un hueco gigante arriba */
+
 .texts .blocker {
+
   flex: 0 0 6px;
+
   height: 6px;
+
   min-height: 6px;
+
 }
 
 /* La barra queda invisible en móvil, pero el gesto de deslizar funciona */
+
 @media (max-width: 700px) {
+
   .texts {
+
     overflow-y: auto !important;
+
     touch-action: pan-y;
+
     -webkit-overflow-scrolling: touch;
+
     overscroll-behavior: contain;
+
     scrollbar-width: none;
+
   }
 
   .texts::-webkit-scrollbar {
+
     display: none;
+
   }
 
   .texts .text {
+
     max-width: 90%;
+
   }
+
 }
 
 /* RESTAURAR EL SCROLL DE LA PÁGINA PRINCIPAL
+
    Pega este bloque al FINAL de style.css.
+
    Desactiva el desplazamiento interno del chat para que la rueda/dedo
+
    haga subir o bajar la página completa. */
 
 html,
+
 body {
+
   overflow-y: auto !important;
+
   overscroll-behavior-y: auto !important;
+
 }
 
 .phone,
+
 .phone-screen,
+
 .chat-content {
+
   overscroll-behavior: auto !important;
+
 }
 
 /* El área de mensajes deja de capturar el scroll */
+
 .texts {
+
   overflow-y: visible !important;
+
   overflow-x: hidden !important;
+
   overscroll-behavior-y: auto !important;
+
   -webkit-overflow-scrolling: auto !important;
+
   touch-action: auto !important;
+
   scroll-behavior: auto !important;
+
   scrollbar-width: none !important;
+
 }
 
 .texts::-webkit-scrollbar {
+
   display: none !important;
+
 }
 
 /* Evita que el chat parezca un panel independiente desplazable */
+
 .texts,
+
 .texts * {
+
   overscroll-behavior-y: auto !important;
+
 }
 
 /* No cambiar la posición, el tamaño ni la animación de las burbujas. */
 
 /* =========================================================
+
    N U E S T R A S   R O L I T A S
+
    Tema: rosa por defecto; paleta de canción solo al reproducir.
+
    Este bloque reemplaza los parches de tema dinámico duplicados.
+
    ========================================================= */
 
 /* Valores rosados de respaldo mientras no se ha pulsado Play. */
+
 :root {
+
   --song-glow: #b45491;
+
   --song-deep: #17101f;
+
   --song-accent: #ff83bd;
+
 }
 
 /* El fondo inicial conserva el diseño rosado original. */
+
 body:not([data-song-theme]) {
+
   background-color: var(--bg);
+
   background-image:
+
     radial-gradient(ellipse 75% 35% at 50% -7%, rgba(177, 70, 128, .28), transparent 72%),
+
     radial-gradient(ellipse 45% 30% at 0% 26%, rgba(107, 69, 163, .16), transparent 74%),
+
     radial-gradient(ellipse 50% 34% at 100% 60%, rgba(140, 47, 99, .15), transparent 74%),
+
     radial-gradient(ellipse 75% 30% at 50% 105%, rgba(76, 52, 121, .20), transparent 70%),
+
     linear-gradient(155deg, #0b0812 0%, #171020 45%, #100a18 75%, #08070d 100%);
+
 }
 
 /* Evita que las variables inline del JS cambien los controles antes de Play. */
+
 body:not([data-song-theme]) .player-card {
+
   --song-glow: #b45491 !important;
+
   --song-deep: #17101f !important;
+
   --song-accent: #ff83bd !important;
+
 }
 
 /* Tema de canción: solo se activa cuando JS añade data-song-theme al body. */
+
 body[data-song-theme] {
+
   background-color: var(--song-deep, #17101f);
+
   background-image:
+
     radial-gradient(ellipse 75% 35% at 50% -7%,
+
       color-mix(in srgb, var(--song-glow, #b45491) 42%, transparent), transparent 72%),
+
     radial-gradient(ellipse 45% 30% at 0% 26%,
+
       color-mix(in srgb, var(--song-accent, #ff83bd) 19%, transparent), transparent 74%),
+
     radial-gradient(ellipse 50% 34% at 100% 60%,
+
       color-mix(in srgb, var(--song-glow, #b45491) 25%, transparent), transparent 74%),
+
     radial-gradient(ellipse 75% 30% at 50% 105%,
+
       color-mix(in srgb, var(--song-accent, #ff83bd) 16%, transparent), transparent 70%),
+
     linear-gradient(155deg, var(--song-deep, #17101f) 0%, #171020 48%, #08070d 100%);
+
   transition: background 700ms ease, background-color 700ms ease;
+
 }
 
 .player-card {
+
   background:
+
     radial-gradient(ellipse at 12% 8%,
+
       color-mix(in srgb, var(--song-glow, #b45491) 32%, transparent), transparent 58%),
+
     radial-gradient(ellipse at 90% 100%,
+
       color-mix(in srgb, var(--song-accent, #ff83bd) 12%, transparent), transparent 48%),
+
     linear-gradient(145deg,
+
       color-mix(in srgb, var(--song-deep, #17101f) 86%, #24192d), #0f0b16 88%) !important;
+
   border-color: color-mix(in srgb, var(--song-glow, #b45491) 30%, rgba(255, 210, 236, .15)) !important;
+
   box-shadow:
+
     0 30px 90px rgba(0,0,0,.34),
+
     0 0 44px color-mix(in srgb, var(--song-glow, #b45491) 10%, transparent),
+
     inset 0 1px rgba(255,255,255,.065);
+
   transition: background 700ms ease, border-color 700ms ease, box-shadow 700ms ease;
+
 }
 
 .player-card::before {
+
   background: linear-gradient(90deg, transparent,
+
     color-mix(in srgb, var(--song-accent, #ff83bd) 52%, white), transparent);
+
   transition: background 700ms ease;
+
 }
 
 /* Barras de progreso y volumen. */
+
 .player-card .seek_slider,
+
 .player-card .volume_slider {
+
   background: linear-gradient(to right,
+
     var(--song-accent, #ff83bd), rgba(255,255,255,.16)) !important;
+
   accent-color: var(--song-accent, #ff83bd);
+
 }
 
 .player-card .seek_slider::-webkit-slider-thumb,
+
 .player-card .volume_slider::-webkit-slider-thumb {
+
   background: var(--song-accent, #ff83bd) !important;
+
   box-shadow: 0 0 0 4px color-mix(in srgb,
+
     var(--song-accent, #ff83bd) 16%, transparent) !important;
+
 }
 
 .player-card .seek_slider::-moz-range-thumb,
+
 .player-card .volume_slider::-moz-range-thumb {
+
   background: var(--song-accent, #ff83bd) !important;
+
 }
 
 /* Botón principal y controles secundarios. */
+
 .player-card .play-button {
+
   background: linear-gradient(145deg,
+
     color-mix(in srgb, var(--song-accent, #ff83bd) 35%, white),
+
     var(--song-accent, #ff83bd) 52%,
+
     color-mix(in srgb, var(--song-glow, #b45491) 72%, black)) !important;
+
   box-shadow: 0 9px 30px color-mix(in srgb,
+
     var(--song-accent, #ff83bd) 28%, transparent) !important;
+
 }
 
 .player-card .control-button:hover,
+
 .player-card .control-button.active {
+
   color: var(--song-accent, #ff83bd) !important;
+
   background: color-mix(in srgb,
+
     var(--song-accent, #ff83bd) 12%, transparent) !important;
+
 }
 
 .player-card .live-dot,
+
 .player-card .equalizer .stroke {
+
   background-color: var(--song-accent, #ff83bd) !important;
+
   transition: background-color 700ms ease;
+
 }
 
 /* Otros acentos de la página: rosados por defecto. */
+
+.eyebrow,
+
+.section-index,
+
+.now-playing,
+
+.phone-caption i,
+
+.player-note i,
+
+.footer-heart,
+
+.title-heart,
+
+.section-title > span {
+
+  color: var(--pink-bright);
+
+}
+
+.eyebrow-dot,
+
+.live-dot,
+
+.scroll-cue span::after {
+
+  background-color: var(--pink-bright);
+
+}
+
+/* Cambiar acentos de la página solo después de activar un tema. */
+
+body[data-song-theme] .eyebrow,
+
+body[data-song-theme] .section-index,
+
+body[data-song-theme] .now-playing,
+
+body[data-song-theme] .phone-caption i,
+
+body[data-song-theme] .player-note i,
+
+body[data-song-theme] .footer-heart,
+
+body[data-song-theme] .title-heart,
+
+body[data-song-theme] .section-title > span {
+
+  color: var(--song-accent, #ff83bd);
+
+}
+
+body[data-song-theme] .eyebrow-dot,
+
+body[data-song-theme] .live-dot,
+
+body[data-song-theme] .scroll-cue span::after {
+
+  background-color: var(--song-accent, #ff83bd);
+
+}
+
+/* La conversación mantiene su interfaz clara y sus colores originales. */
+
+.texts {
+
+  scrollbar-color: #c28aaa transparent;
+
+}
+
+.texts::-webkit-scrollbar-thumb {
+
+  background: #c28aaa;
+
+}
+
+/* FIX: botón "Ver mensajes anteriores" del celular.
+
+   Se conserva el estilo rosado y el centrado original. */
+
+.chat-content .chat-message-navigation {
+
+  display: flex !important;
+
+  justify-content: center !important;
+
+  align-items: center !important;
+
+  width: 100% !important;
+
+  text-align: center !important;
+
+  box-sizing: border-box !important;
+
+}
+
+.chat-content .chat-message-navigation .chat-message-toggle,
+
+.chat-message-navigation .chat-message-toggle {
+
+  appearance: none !important;
+
+  -webkit-appearance: none !important;
+
+  display: inline-flex !important;
+
+  align-items: center !important;
+
+  justify-content: center !important;
+
+  gap: 7px !important;
+
+  width: auto !important;
+
+  max-width: calc(100% - 12px) !important;
+
+  min-height: 30px !important;
+
+  height: auto !important;
+
+  margin: 0 auto !important;
+
+  padding: 7px 13px !important;
+
+  background: linear-gradient(135deg, #ffffff, #fff3fa) !important;
+
+  background-color: #fff7fb !important;
+
+  color: #a44d80 !important;
+
+  border: 1px solid #e7bfd5 !important;
+
+  border-radius: 999px !important;
+
+  box-shadow: 0 2px 8px rgba(133, 66, 105, .12) !important;
+
+  font-family: "DM Sans", sans-serif !important;
+
+  font-size: 10px !important;
+
+  font-weight: 700 !important;
+
+  line-height: 1.2 !important;
+
+  text-align: center !important;
+
+  white-space: nowrap !important;
+
+  cursor: pointer !important;
+
+}
+
+.chat-message-navigation .chat-message-toggle i {
+
+  color: #c06a9a !important;
+
+}
+
+.chat-message-navigation .chat-message-toggle:hover {
+
+  background: linear-gradient(135deg, #fff7fb, #ffe8f4) !important;
+
+  color: #913b6e !important;
+
+  border-color: #dba0c1 !important;
+
+}
+
+.chat-message-navigation .chat-message-toggle[hidden] {
+
+  display: none !important;
+
+}
+
+.chat-content .chat-message-navigation .chat-message-toggle {
+
+  margin-left: auto !important;
+
+  margin-right: auto !important;
+
+  float: none !important;
+
+}
+
+
+/* MEJORAS: transiciones cinematográficas suaves sin alterar el chat */
+body {
+  transition: background-color 850ms ease, color 500ms ease;
+}
+body::before {
+  transition: opacity 850ms ease;
+}
+.player-card,
+.player-card::before,
+.player-card .play-button,
+.player-card .control-button,
+.player-card .seek_slider,
+.player-card .volume_slider,
 .eyebrow,
 .section-index,
 .now-playing,
@@ -1212,98 +1771,131 @@ body[data-song-theme] {
 .player-note i,
 .footer-heart,
 .title-heart,
-.section-title > span {
-  color: var(--pink-bright);
-}
-
+.section-title > span,
 .eyebrow-dot,
 .live-dot,
 .scroll-cue span::after {
-  background-color: var(--pink-bright);
+  transition: background-color 750ms ease, color 750ms ease, border-color 750ms ease, box-shadow 750ms ease;
 }
 
-/* Cambiar acentos de la página solo después de activar un tema. */
-body[data-song-theme] .eyebrow,
-body[data-song-theme] .section-index,
-body[data-song-theme] .now-playing,
-body[data-song-theme] .phone-caption i,
-body[data-song-theme] .player-note i,
-body[data-song-theme] .footer-heart,
-body[data-song-theme] .title-heart,
-body[data-song-theme] .section-title > span {
+/* Carta sorpresa: mensaje fijo, limpio y centrado */
+.letter-section {
+  padding: 0 0 clamp(58px, 8vw, 92px);
+  text-align: center;
+}
+.letter-section > .section-heading {
+  justify-content: center;
+  text-align: center;
+  flex-wrap: wrap;
+}
+.letter-section > .section-heading .section-index {
+  flex: 0 0 100%;
+  text-align: center;
+}
+.letter-section > .section-heading .section-line { display: none; }
+.letter-section > .section-title { text-align: center; margin-bottom: 18px; }
+.letter-card {
+  width: min(100%, 560px);
+  margin: 22px auto 0;
+  padding: clamp(22px, 4vw, 34px);
+  border: 1px solid rgba(255, 190, 220, .24);
+  border-radius: 24px;
+  background: radial-gradient(ellipse at top, rgba(244, 166, 204, .12), transparent 70%), rgba(28, 19, 35, .82);
+  box-shadow: 0 22px 65px rgba(0,0,0,.22), 0 0 35px rgba(255,131,189,.07);
+  text-align: center;
+  animation: letter-reveal 550ms cubic-bezier(.2,.75,.25,1) both;
+}
+.letter-card[hidden] { display: none !important; }
+.letter-kicker {
+  margin: 0;
+  color: var(--pink-bright);
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.letter-stamp { margin: 12px 0 8px; font-size: 1.8rem; line-height: 1.2; }
+.letter-message {
+  margin: 0;
+  padding: 18px 12px;
+  color: var(--text);
+  font: 500 clamp(1.15rem, 3.5vw, 1.5rem)/1.65 var(--font-display);
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+.letter-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 10px 16px;
+  border: 1px solid rgba(255,190,220,.28);
+  border-radius: 999px;
+  background: rgba(255,131,189,.12);
+  color: #ffe7f3;
+  font: 700 .78rem/1.3 var(--font-body);
+  cursor: pointer;
+  transition: transform .2s ease, background .2s ease, border-color .2s ease;
+}
+.letter-button:hover { transform: translateY(-1px); background: rgba(255,131,189,.2); border-color: rgba(255,190,220,.5); }
+.letter-button--primary { background: linear-gradient(135deg,#ffe0ef,#f5a0c7 55%,#d96ca8); color: #271523; }
+@keyframes letter-reveal {
+  from { opacity: 0; transform: translateY(16px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (max-width: 480px) {
+  .letter-section { padding-bottom: 52px; }
+  .letter-card { border-radius: 21px; padding: 22px 18px; }
+  .letter-button { min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .letter-button { transition-duration: .01ms !important; }
+  .letter-card { animation-duration: .01ms !important; }
+}
+
+/* La carta también sigue la paleta de la canción activa, con transición suave. */
+.letter-card,
+.letter-kicker,
+.letter-button,
+.letter-section > .section-title > span {
+  transition: background 750ms ease, background-color 750ms ease, border-color 750ms ease,
+              box-shadow 750ms ease, color 750ms ease;
+}
+
+body[data-song-theme] .letter-card {
+  border-color: color-mix(in srgb, var(--song-accent, #ff83bd) 34%, transparent);
+  background:
+    radial-gradient(ellipse at top,
+      color-mix(in srgb, var(--song-glow, #b45491) 24%, transparent), transparent 72%),
+    color-mix(in srgb, var(--song-deep, #17101f) 78%, #1c1323);
+  box-shadow: 0 22px 65px rgba(0,0,0,.22),
+    0 0 35px color-mix(in srgb, var(--song-glow, #b45491) 16%, transparent);
+}
+
+body[data-song-theme] .letter-kicker,
+body[data-song-theme] .letter-section > .section-title > span {
   color: var(--song-accent, #ff83bd);
 }
 
-body[data-song-theme] .eyebrow-dot,
-body[data-song-theme] .live-dot,
-body[data-song-theme] .scroll-cue span::after {
-  background-color: var(--song-accent, #ff83bd);
+body[data-song-theme] .letter-button {
+  border-color: color-mix(in srgb, var(--song-accent, #ff83bd) 38%, transparent);
+  background: color-mix(in srgb, var(--song-glow, #b45491) 18%, transparent);
+  color: var(--text);
 }
 
-/* La conversación mantiene su interfaz clara y sus colores originales. */
-.texts {
-  scrollbar-color: #c28aaa transparent;
-}
-.texts::-webkit-scrollbar-thumb {
-  background: #c28aaa;
+body[data-song-theme] .letter-button:hover {
+  border-color: color-mix(in srgb, var(--song-accent, #ff83bd) 65%, transparent);
+  background: color-mix(in srgb, var(--song-glow, #b45491) 30%, transparent);
 }
 
-/* FIX: botón "Ver mensajes anteriores" del celular.
-   Se conserva el estilo rosado y el centrado original. */
-.chat-content .chat-message-navigation {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  width: 100% !important;
-  text-align: center !important;
-  box-sizing: border-box !important;
+body[data-song-theme] .letter-button--primary {
+  border-color: transparent;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--song-accent, #ff83bd) 35%, white),
+    var(--song-accent, #ff83bd) 58%,
+    color-mix(in srgb, var(--song-glow, #b45491) 78%, black));
+  color: #fff9fc;
+  box-shadow: 0 7px 24px color-mix(in srgb, var(--song-glow, #b45491) 25%, transparent);
 }
 
-.chat-content .chat-message-navigation .chat-message-toggle,
-.chat-message-navigation .chat-message-toggle {
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 7px !important;
-  width: auto !important;
-  max-width: calc(100% - 12px) !important;
-  min-height: 30px !important;
-  height: auto !important;
-  margin: 0 auto !important;
-  padding: 7px 13px !important;
-  background: linear-gradient(135deg, #ffffff, #fff3fa) !important;
-  background-color: #fff7fb !important;
-  color: #a44d80 !important;
-  border: 1px solid #e7bfd5 !important;
-  border-radius: 999px !important;
-  box-shadow: 0 2px 8px rgba(133, 66, 105, .12) !important;
-  font-family: "DM Sans", sans-serif !important;
-  font-size: 10px !important;
-  font-weight: 700 !important;
-  line-height: 1.2 !important;
-  text-align: center !important;
-  white-space: nowrap !important;
-  cursor: pointer !important;
-}
-
-.chat-message-navigation .chat-message-toggle i {
-  color: #c06a9a !important;
-}
-
-.chat-message-navigation .chat-message-toggle:hover {
-  background: linear-gradient(135deg, #fff7fb, #ffe8f4) !important;
-  color: #913b6e !important;
-  border-color: #dba0c1 !important;
-}
-
-.chat-message-navigation .chat-message-toggle[hidden] {
-  display: none !important;
-}
-
-.chat-content .chat-message-navigation .chat-message-toggle {
-  margin-left: auto !important;
-  margin-right: auto !important;
-  float: none !important;
-}
