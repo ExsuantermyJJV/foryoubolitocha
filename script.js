@@ -192,11 +192,11 @@ function animateChatMessages() {
 
   const latestMessages = [
 
-    "Holap",
+    "No quiero molestarte",
 
-    "Una pequeña actualizacion",
+    "Te ves bien en tu relacion",
 
-    "Te odio estafadora"
+    "Recuerda lo mucho que vales, no esperes menos"
 
   ];
 
