@@ -29,9 +29,135 @@
   <div class="ambient ambient--one" aria-hidden="true"></div>
   <div class="ambient ambient--two" aria-hidden="true"></div>
 
-  <main class="page-shell">
+  <!-- =====================================
+       ACCESO GLOBAL: WEB PRIVADA
+  ====================================== -->
+
+  <div id="auth-screen" class="auth-screen">
+    <div class="auth-card">
+
+      <div class="auth-heart">♡</div>
+
+      <p class="auth-kicker">NUESTRAS ROLITAS</p>
+
+      <h1>Un pequeño espacio</h1>
+
+      <p class="auth-description">
+        Inicia sesión o crea una cuenta para entrar.
+      </p>
+
+      <!-- COMPROBANDO SESIÓN -->
+      <div id="auth-loading">
+        Comprobando tu sesión...
+      </div>
+
+      <!-- OPCIONES DE ACCESO -->
+      <div id="chat-gate" hidden>
+
+        <button id="show-login" type="button">
+          Iniciar sesión
+        </button>
+
+        <button id="show-register" type="button">
+          Crear una cuenta
+        </button>
+
+      </div>
+
+      <!-- INICIAR SESIÓN -->
+      <form id="chat-login" hidden>
+
+        <h3>Qué bueno tenerte aquí ❤️</h3>
+
+        <label for="chat-email">
+          Correo electrónico
+        </label>
+
+        <input
+          id="chat-email"
+          type="email"
+          placeholder="tu@correo.com"
+          autocomplete="username"
+          required
+        >
+
+        <label for="chat-password">
+          Contraseña
+        </label>
+
+        <input
+          id="chat-password"
+          type="password"
+          placeholder="Tu contraseña"
+          autocomplete="current-password"
+          required
+        >
+
+        <button type="submit">
+          Iniciar sesión
+        </button>
+
+        <button type="button" id="back-login">
+          Volver
+        </button>
+
+        <p id="chat-login-error" role="alert"></p>
+
+      </form>
+
+      <!-- REGISTRO -->
+      <form id="chat-register" hidden>
+
+        <h3>Crear una cuenta 💗</h3>
+
+        <label for="register-email">
+          Correo electrónico
+        </label>
+
+        <input
+          id="register-email"
+          type="email"
+          placeholder="tu@correo.com"
+          autocomplete="email"
+          required
+        >
+
+        <label for="register-password">
+          Contraseña
+        </label>
+
+        <input
+          id="register-password"
+          type="password"
+          minlength="6"
+          placeholder="Mínimo 6 caracteres"
+          autocomplete="new-password"
+          required
+        >
+
+        <button type="submit">
+          Crear mi cuenta
+        </button>
+
+        <button type="button" id="back-register">
+          Volver
+        </button>
+
+        <p id="register-error" role="alert"></p>
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- =====================================
+       CONTENIDO PRIVADO
+  ====================================== -->
+
+  <main class="page-shell" id="private-content" hidden>
 
     <header class="intro">
+
       <p class="eyebrow">
         <span class="eyebrow-dot"></span>
         A Little Corner of Our Own
@@ -44,6 +170,7 @@
 
       <p class="intro-copy">Con algunos recuerdos</p>
       <p class="intro-subtitle">Un pequeño teléfono, muchas cositas dentro.</p>
+
     </header>
 
     <!-- TELÉFONO -->
@@ -64,6 +191,7 @@
 
           <!-- DYNAMIC ISLAND -->
           <div class="dynamic-island" id="dynamic-island" aria-label="Dynamic Island">
+
             <span class="dynamic-island-camera" aria-hidden="true"></span>
 
             <span class="dynamic-island-content">
@@ -74,6 +202,7 @@
             <span class="dynamic-island-wave" aria-hidden="true">
               <i></i><i></i><i></i><i></i>
             </span>
+
           </div>
 
           <!-- REFLEJO -->
@@ -81,6 +210,7 @@
 
           <!-- BARRA DE ESTADO -->
           <div class="phone-status">
+
             <span id="phone-clock">--:--</span>
 
             <span class="status-icons">
@@ -88,9 +218,13 @@
               <i class="fa-solid fa-wifi"></i>
               <i class="fa-solid fa-battery-three-quarters"></i>
             </span>
+
           </div>
 
-          <!-- INICIO -->
+          <!-- =================================
+               PANTALLA DE INICIO
+          ================================== -->
+
           <section class="home-screen app-screen" id="phone-home" data-app-screen="home">
 
             <div class="home-welcome">
@@ -100,6 +234,7 @@
             </div>
 
             <div class="home-widget">
+
               <div class="widget-icon">
                 <i class="fa-regular fa-heart"></i>
               </div>
@@ -109,8 +244,10 @@
                 <strong>Nuestras rolitas</strong>
                 <small>Algunos recuerdos y mensajes.</small>
               </div>
+
             </div>
 
+            <!-- APLICACIONES -->
             <div class="app-grid">
 
               <button class="app-icon" type="button" data-open-app="messages">
@@ -150,12 +287,17 @@
               </button>
 
             </div>
+
           </section>
 
-          <!-- MENSAJES -->
+          <!-- =================================
+               APP: MENSAJES
+          ================================== -->
+
           <section class="app-screen app-view" data-app-screen="messages" hidden>
 
             <div class="app-header">
+
               <button class="app-back" type="button" data-go-home aria-label="Volver">
                 <i class="fa-solid fa-chevron-left"></i>
               </button>
@@ -168,11 +310,13 @@
               <span class="app-header-symbol">
                 <i class="fa-solid fa-message"></i>
               </span>
+
             </div>
 
             <section id="firebase-chat" class="firebase-chat" aria-label="Conversación privada">
 
               <div class="firebase-chat-heading">
+
                 <div>
                   <strong>Nuestro chat ❤️</strong>
                   <small id="chat-status">Conversación privada</small>
@@ -181,68 +325,8 @@
                 <button id="chat-logout" class="chat-logout" type="button" hidden>
                   Cerrar sesión
                 </button>
+
               </div>
-
-              <div id="chat-gate">
-                <div class="chat-gate-icon">
-                  <i class="fa-regular fa-heart"></i>
-                </div>
-
-                <h3>¿Quieres enviar mensajes? 💌</h3>
-
-                <p>
-                  Puedes disfrutar del teléfono sin registrarte.
-                  Para participar en nuestra conversación necesitas una cuenta.
-                </p>
-
-                <button id="show-login" type="button">
-                  <i class="fa-solid fa-right-to-bracket"></i>
-                  Iniciar sesión
-                </button>
-
-                <button id="show-register" type="button">
-                  <i class="fa-solid fa-user-plus"></i>
-                  Crear una cuenta
-                </button>
-
-                <small class="chat-private-note">
-                  Un pequeño espacio para dos personas ❤️
-                </small>
-              </div>
-
-              <!-- LOGIN -->
-              <form id="chat-login" class="chat-login" hidden>
-                <h3>Qué bueno tenerte aquí ❤️</h3>
-                <p>Ingresa a tu cuenta para continuar.</p>
-
-                <label for="chat-email">Correo electrónico</label>
-                <input id="chat-email" type="email" placeholder="tu@correo.com" autocomplete="username" required>
-
-                <label for="chat-password">Contraseña</label>
-                <input id="chat-password" type="password" placeholder="Tu contraseña" autocomplete="current-password" required>
-
-                <button type="submit">Iniciar sesión</button>
-                <button type="button" id="back-login" class="chat-back-button">Volver</button>
-
-                <p id="chat-login-error" class="chat-error" role="alert"></p>
-              </form>
-
-              <!-- REGISTRO -->
-              <form id="chat-register" class="chat-login" hidden>
-                <h3>Crear una cuenta 💗</h3>
-                <p>Regístrate para poder participar en la conversación.</p>
-
-                <label for="register-email">Correo electrónico</label>
-                <input id="register-email" type="email" placeholder="tu@correo.com" autocomplete="email" required>
-
-                <label for="register-password">Crear contraseña</label>
-                <input id="register-password" type="password" placeholder="Mínimo 6 caracteres" minlength="6" autocomplete="new-password" required>
-
-                <button type="submit">Crear mi cuenta</button>
-                <button type="button" id="back-register" class="chat-back-button">Volver</button>
-
-                <p id="register-error" class="chat-error" role="alert"></p>
-              </form>
 
               <!-- SALA DEL CHAT -->
               <div id="chat-room" class="chat-room" hidden>
@@ -260,12 +344,25 @@
                   </p>
                 </div>
 
+                <!-- ENVÍO DE MENSAJES -->
                 <form id="chat-send-form" class="chat-send-form">
-                  <label class="chat-attachment-button" for="chat-file-input" aria-label="Adjuntar fotografía o video" title="Adjuntar">
+
+                  <label
+                    class="chat-attachment-button"
+                    for="chat-file-input"
+                    aria-label="Adjuntar fotografía o video"
+                    title="Adjuntar"
+                  >
                     <i class="fa-solid fa-plus"></i>
                   </label>
 
-                  <input id="chat-file-input" type="file" accept="image/*,video/*" multiple hidden>
+                  <input
+                    id="chat-file-input"
+                    type="file"
+                    accept="image/*,video/*"
+                    multiple
+                    hidden
+                  >
 
                   <input
                     id="chat-message-input"
@@ -279,19 +376,27 @@
                   <button id="chat-send-button" type="submit" aria-label="Enviar mensaje">
                     <i class="fa-solid fa-paper-plane"></i>
                   </button>
+
                 </form>
 
                 <div id="chat-file-preview" class="chat-file-preview" hidden></div>
+
                 <p id="chat-send-error" class="chat-error" role="alert"></p>
+
               </div>
 
             </section>
+
           </section>
 
-          <!-- MÚSICA -->
+          <!-- =================================
+               APP: MÚSICA
+          ================================== -->
+
           <section class="app-screen app-view" data-app-screen="music" hidden>
 
             <div class="app-header">
+
               <button class="app-back" type="button" data-go-home aria-label="Volver">
                 <i class="fa-solid fa-chevron-left"></i>
               </button>
@@ -304,6 +409,7 @@
               <span class="app-header-symbol">
                 <i class="fa-solid fa-music"></i>
               </span>
+
             </div>
 
             <div class="player-card">
@@ -319,6 +425,7 @@
               <div class="player-layout">
 
                 <div class="album-column">
+
                   <div class="album-frame">
                     <div class="track-art" role="img" aria-label="Portada de la canción actual"></div>
                     <div class="album-shine" aria-hidden="true"></div>
@@ -333,6 +440,7 @@
                     <span class="stroke"></span>
                     <span class="stroke"></span>
                   </div>
+
                 </div>
 
                 <div class="player-main">
@@ -344,17 +452,27 @@
                   </div>
 
                   <div class="progress-area">
+
                     <div class="slider-track">
-                      <input type="range" min="0" max="100" value="0" class="seek_slider" aria-label="Progreso de la canción">
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value="0"
+                        class="seek_slider"
+                        aria-label="Progreso de la canción"
+                      >
                     </div>
 
                     <div class="time-labels">
                       <span class="current-time">00:00</span>
                       <span class="total-duration">00:00</span>
                     </div>
+
                   </div>
 
                   <div class="player-controls">
+
                     <button type="button" class="random-track control-button" aria-label="Aleatorio" title="Aleatorio">
                       <i class="fa-solid fa-shuffle"></i>
                     </button>
@@ -374,6 +492,7 @@
                     <button type="button" class="repeat-track control-button" aria-label="Repetir canción actual" title="Repetir">
                       <i class="fa-solid fa-repeat"></i>
                     </button>
+
                   </div>
 
                   <div class="volume-row">
@@ -386,15 +505,23 @@
                     <i class="fa-regular fa-heart"></i>
                     Reproducción en curso
                   </p>
+
                 </div>
+
               </div>
+
             </div>
+
           </section>
 
-          <!-- CARTITAS -->
+          <!-- =================================
+               APP: CARTITAS
+          ================================== -->
+
           <section class="app-screen app-view" data-app-screen="letters" hidden>
 
             <div class="app-header">
+
               <button class="app-back" type="button" data-go-home aria-label="Volver">
                 <i class="fa-solid fa-chevron-left"></i>
               </button>
@@ -407,6 +534,7 @@
               <span class="app-header-symbol">
                 <i class="fa-solid fa-envelope"></i>
               </span>
+
             </div>
 
             <div class="letter-app-content">
@@ -417,12 +545,18 @@
                 <p>Hay cosas que merecen quedarse escritas.</p>
               </div>
 
-              <button type="button" class="letter-button letter-button--primary letter-toggle" aria-expanded="false" aria-controls="letter-card">
+              <button
+                type="button"
+                class="letter-button letter-button--primary letter-toggle"
+                aria-expanded="false"
+                aria-controls="letter-card"
+              >
                 <i class="fa-regular fa-envelope" aria-hidden="true"></i>
                 Abrir cartita 💌
               </button>
 
               <div class="letter-card" id="letter-card" hidden>
+
                 <p class="letter-kicker">
                   <i class="fa-regular fa-heart" aria-hidden="true"></i>
                   Un mensajito para ti
@@ -433,14 +567,21 @@
                 <p class="letter-message">
                   Espero que estes bien, todo se ve bien. No quiero molestarte
                 </p>
+
               </div>
+
             </div>
+
           </section>
 
-          <!-- FOTOS -->
+          <!-- =================================
+               APP: FOTOS
+          ================================== -->
+
           <section class="app-screen app-view" data-app-screen="photos" hidden>
 
             <div class="app-header">
+
               <button class="app-back" type="button" data-go-home aria-label="Volver">
                 <i class="fa-solid fa-chevron-left"></i>
               </button>
@@ -453,15 +594,18 @@
               <span class="app-header-symbol">
                 <i class="fa-solid fa-images"></i>
               </span>
+
             </div>
 
             <div class="photos-content">
+
               <div class="photos-intro">
                 <h3>Pequeños recuerdos</h3>
                 <p>Algunas imágenes que acompañan nuestras rolitas.</p>
               </div>
 
               <div class="photo-grid">
+
                 <figure class="photo-item">
                   <img src="img/cafune.jpg" alt="Portada de Tek It">
                   <figcaption>Tek It ♡</figcaption>
@@ -496,14 +640,21 @@
                   <img src="img/msg-765387767-131546.jpg" alt="Portada de Something About You">
                   <figcaption>Something About You</figcaption>
                 </figure>
+
               </div>
+
             </div>
+
           </section>
 
-          <!-- AJUSTES -->
+          <!-- =================================
+               APP: AJUSTES
+          ================================== -->
+
           <section class="app-screen app-view" data-app-screen="settings" hidden>
 
             <div class="app-header">
+
               <button class="app-back" type="button" data-go-home aria-label="Volver">
                 <i class="fa-solid fa-chevron-left"></i>
               </button>
@@ -516,20 +667,24 @@
               <span class="app-header-symbol">
                 <i class="fa-solid fa-gear"></i>
               </span>
+
             </div>
 
             <div class="settings-content">
 
               <div class="settings-profile">
                 <div class="settings-avatar">♡</div>
-                <h3>Nuestras rolitas</h3>
+                <h3>En proceso xd</h3>
                 <p>Un pequeño rincón especial.</p>
               </div>
 
+              <!-- PERSONALIZACIÓN -->
               <div class="settings-group">
+
                 <span class="settings-label">PERSONALIZACIÓN</span>
 
                 <div class="settings-item settings-item--control">
+
                   <span class="settings-item-icon">
                     <i class="fa-solid fa-image"></i>
                   </span>
@@ -539,11 +694,16 @@
                     <small>Elige una fotografía de tu dispositivo.</small>
                   </span>
 
-                  <label class="settings-upload-button" for="wallpaper-upload">Cambiar</label>
+                  <label class="settings-upload-button" for="wallpaper-upload">
+                    Cambiar
+                  </label>
+
                   <input type="file" id="wallpaper-upload" accept="image/*" hidden>
+
                 </div>
 
                 <div class="settings-item settings-item--control">
+
                   <span class="settings-item-icon">
                     <i class="fa-solid fa-palette"></i>
                   </span>
@@ -553,10 +713,17 @@
                     <small>Personaliza el color principal.</small>
                   </span>
 
-                  <input type="color" id="accent-color" value="#d96ba9" aria-label="Elegir color del sistema">
+                  <input
+                    type="color"
+                    id="accent-color"
+                    value="#d96ba9"
+                    aria-label="Elegir color del sistema"
+                  >
+
                 </div>
 
                 <div class="settings-item settings-item--control">
+
                   <span class="settings-item-icon">
                     <i class="fa-solid fa-moon"></i>
                   </span>
@@ -570,18 +737,23 @@
                     <option value="dark">Oscuro</option>
                     <option value="light">Claro</option>
                   </select>
+
                 </div>
 
                 <button type="button" id="reset-customization" class="settings-reset-button">
                   <i class="fa-solid fa-rotate-left"></i>
                   Restaurar apariencia original
                 </button>
+
               </div>
 
+              <!-- INFORMACIÓN -->
               <div class="settings-group">
+
                 <span class="settings-label">TELÉFONO</span>
 
                 <div class="settings-item">
+
                   <span class="settings-item-icon">
                     <i class="fa-solid fa-heart"></i>
                   </span>
@@ -590,9 +762,11 @@
                     <strong>Nombre del dispositivo</strong>
                     <small>Mi pequeño espacio</small>
                   </span>
+
                 </div>
 
                 <div class="settings-item">
+
                   <span class="settings-item-icon">
                     <i class="fa-solid fa-circle-info"></i>
                   </span>
@@ -601,11 +775,13 @@
                     <strong>Versión</strong>
                     <small>Nuestras rolitas · 2.0</small>
                   </span>
+
                 </div>
+
               </div>
 
-              <p class="settings-footer">Hecho con un poquito de cariño ♡</p>
             </div>
+
           </section>
 
           <!-- =====================================
@@ -619,12 +795,14 @@
             aria-hidden="true"
             hidden
           >
+
             <div class="notification-panel">
 
               <div class="notification-handle"></div>
 
               <div class="notification-top">
                 <span id="notification-date">MARTES, 17 DE NOVIEMBRE</span>
+
                 <button type="button" id="close-notifications" aria-label="Cerrar notificaciones">
                   <i class="fa-solid fa-chevron-up"></i>
                 </button>
@@ -643,15 +821,22 @@
                 </div>
 
                 <div class="notification-music-content">
-                  <img id="notification-cover" src="img/cafune.jpg" alt="Portada de la canción">
+
+                  <img
+                    id="notification-cover"
+                    src="img/cafune.jpg"
+                    alt="Portada de la canción"
+                  >
 
                   <div class="notification-music-info">
                     <strong id="notification-song">Nuestras rolitas</strong>
                     <small id="notification-artist">Selecciona una canción</small>
                   </div>
+
                 </div>
 
                 <div class="notification-music-controls">
+
                   <button type="button" id="notification-prev" aria-label="Anterior">
                     <i class="fa-solid fa-backward-step"></i>
                   </button>
@@ -663,7 +848,9 @@
                   <button type="button" id="notification-next" aria-label="Siguiente">
                     <i class="fa-solid fa-forward-step"></i>
                   </button>
+
                 </div>
+
               </article>
 
               <!-- MENSAJES RECIBIDOS -->
@@ -673,10 +860,12 @@
               </div>
 
               <div id="notification-list" class="notification-list">
+
                 <div class="notification-empty" id="notification-empty">
                   <i class="fa-regular fa-bell-slash"></i>
                   <span>No tienes notificaciones nuevas</span>
                 </div>
+
               </div>
 
               <div class="notification-bottom">
@@ -684,6 +873,7 @@
               </div>
 
             </div>
+
           </section>
 
           <!-- BARRA INFERIOR -->
@@ -699,12 +889,14 @@
           </div>
 
         </div>
+
       </div>
 
       <p class="phone-caption">
         <i class="fa-regular fa-heart"></i>
         Nuestro pequeño mundo
       </p>
+
     </section>
 
     <footer class="page-footer">
@@ -712,5 +904,6 @@
     </footer>
 
   </main>
+
 </body>
 </html>
