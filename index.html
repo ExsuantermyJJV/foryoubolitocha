@@ -29,31 +29,24 @@
   <div class="ambient ambient--one" aria-hidden="true"></div>
   <div class="ambient ambient--two" aria-hidden="true"></div>
 
-  <!-- =====================================
-       ACCESO GLOBAL: WEB PRIVADA
-  ====================================== -->
+  <!-- ACCESO GLOBAL -->
 
   <div id="auth-screen" class="auth-screen">
     <div class="auth-card">
 
       <div class="auth-heart">♡</div>
-
       <p class="auth-kicker">NUESTRAS ROLITAS</p>
-
       <h1>Un pequeño espacio</h1>
 
       <p class="auth-description">
         Inicia sesión o crea una cuenta para entrar.
       </p>
 
-      <!-- COMPROBANDO SESIÓN -->
       <div id="auth-loading">
         Comprobando tu sesión...
       </div>
 
-      <!-- OPCIONES DE ACCESO -->
       <div id="chat-gate" hidden>
-
         <button id="show-login" type="button">
           Iniciar sesión
         </button>
@@ -61,18 +54,15 @@
         <button id="show-register" type="button">
           Crear una cuenta
         </button>
-
       </div>
 
       <!-- INICIAR SESIÓN -->
+
       <form id="chat-login" hidden>
 
         <h3>Qué bueno tenerte aquí ❤️</h3>
 
-        <label for="chat-email">
-          Correo electrónico
-        </label>
-
+        <label for="chat-email">Correo electrónico</label>
         <input
           id="chat-email"
           type="email"
@@ -81,10 +71,7 @@
           required
         >
 
-        <label for="chat-password">
-          Contraseña
-        </label>
-
+        <label for="chat-password">Contraseña</label>
         <input
           id="chat-password"
           type="password"
@@ -93,27 +80,19 @@
           required
         >
 
-        <button type="submit">
-          Iniciar sesión
-        </button>
-
-        <button type="button" id="back-login">
-          Volver
-        </button>
+        <button type="submit">Iniciar sesión</button>
+        <button type="button" id="back-login">Volver</button>
 
         <p id="chat-login-error" role="alert"></p>
-
       </form>
 
       <!-- REGISTRO -->
+
       <form id="chat-register" hidden>
 
         <h3>Crear una cuenta 💗</h3>
 
-        <label for="register-email">
-          Correo electrónico
-        </label>
-
+        <label for="register-email">Correo electrónico</label>
         <input
           id="register-email"
           type="email"
@@ -122,10 +101,7 @@
           required
         >
 
-        <label for="register-password">
-          Contraseña
-        </label>
-
+        <label for="register-password">Contraseña</label>
         <input
           id="register-password"
           type="password"
@@ -135,24 +111,16 @@
           required
         >
 
-        <button type="submit">
-          Crear mi cuenta
-        </button>
-
-        <button type="button" id="back-register">
-          Volver
-        </button>
+        <button type="submit">Crear mi cuenta</button>
+        <button type="button" id="back-register">Volver</button>
 
         <p id="register-error" role="alert"></p>
-
       </form>
 
     </div>
   </div>
 
-  <!-- =====================================
-       CONTENIDO PRIVADO
-  ====================================== -->
+  <!-- CONTENIDO PRIVADO -->
 
   <main class="page-shell" id="private-content" hidden>
 
@@ -174,11 +142,11 @@
     </header>
 
     <!-- TELÉFONO -->
+
     <section class="phone-stage">
 
       <div class="phone" id="phone-device">
 
-        <!-- BOTONES FÍSICOS -->
         <div class="phone-action-button"></div>
         <div class="phone-volume-button phone-volume-button--up"></div>
         <div class="phone-volume-button phone-volume-button--down"></div>
@@ -186,10 +154,10 @@
 
         <div class="phone-screen" id="phone-screen">
 
-          <!-- FONDO -->
           <div class="phone-wallpaper" id="phone-wallpaper" aria-hidden="true"></div>
 
           <!-- DYNAMIC ISLAND -->
+
           <div class="dynamic-island" id="dynamic-island" aria-label="Dynamic Island">
 
             <span class="dynamic-island-camera" aria-hidden="true"></span>
@@ -205,10 +173,10 @@
 
           </div>
 
-          <!-- REFLEJO -->
           <div class="phone-glass-reflection" aria-hidden="true"></div>
 
           <!-- BARRA DE ESTADO -->
+
           <div class="phone-status">
 
             <span id="phone-clock">--:--</span>
@@ -221,9 +189,7 @@
 
           </div>
 
-          <!-- =================================
-               PANTALLA DE INICIO
-          ================================== -->
+          <!-- PANTALLA DE INICIO -->
 
           <section class="home-screen app-screen" id="phone-home" data-app-screen="home">
 
@@ -248,6 +214,7 @@
             </div>
 
             <!-- APLICACIONES -->
+
             <div class="app-grid">
 
               <button class="app-icon" type="button" data-open-app="messages">
@@ -290,9 +257,7 @@
 
           </section>
 
-          <!-- =================================
-               APP: MENSAJES
-          ================================== -->
+          <!-- APP: MENSAJES -->
 
           <section class="app-screen app-view" data-app-screen="messages" hidden>
 
@@ -329,6 +294,7 @@
               </div>
 
               <!-- SALA DEL CHAT -->
+
               <div id="chat-room" class="chat-room" hidden>
 
                 <div class="chat-room-heading">
@@ -344,25 +310,9 @@
                   </p>
                 </div>
 
-                <!-- ENVÍO DE MENSAJES -->
+                <!-- ENVÍO DE MENSAJES: SOLO TEXTO -->
+
                 <form id="chat-send-form" class="chat-send-form">
-
-                  <label
-                    class="chat-attachment-button"
-                    for="chat-file-input"
-                    aria-label="Adjuntar fotografía o video"
-                    title="Adjuntar"
-                  >
-                    <i class="fa-solid fa-plus"></i>
-                  </label>
-
-                  <input
-                    id="chat-file-input"
-                    type="file"
-                    accept="image/*,video/*"
-                    multiple
-                    hidden
-                  >
 
                   <input
                     id="chat-message-input"
@@ -379,8 +329,6 @@
 
                 </form>
 
-                <div id="chat-file-preview" class="chat-file-preview" hidden></div>
-
                 <p id="chat-send-error" class="chat-error" role="alert"></p>
 
               </div>
@@ -389,9 +337,7 @@
 
           </section>
 
-          <!-- =================================
-               APP: MÚSICA
-          ================================== -->
+          <!-- APP: MÚSICA -->
 
           <section class="app-screen app-view" data-app-screen="music" hidden>
 
@@ -514,9 +460,7 @@
 
           </section>
 
-          <!-- =================================
-               APP: CARTITAS
-          ================================== -->
+          <!-- APP: CARTITAS -->
 
           <section class="app-screen app-view" data-app-screen="letters" hidden>
 
@@ -574,9 +518,7 @@
 
           </section>
 
-          <!-- =================================
-               APP: FOTOS
-          ================================== -->
+          <!-- APP: FOTOS -->
 
           <section class="app-screen app-view" data-app-screen="photos" hidden>
 
@@ -647,9 +589,7 @@
 
           </section>
 
-          <!-- =================================
-               APP: AJUSTES
-          ================================== -->
+          <!-- APP: AJUSTES -->
 
           <section class="app-screen app-view" data-app-screen="settings" hidden>
 
@@ -679,6 +619,7 @@
               </div>
 
               <!-- PERSONALIZACIÓN -->
+
               <div class="settings-group">
 
                 <span class="settings-label">PERSONALIZACIÓN</span>
@@ -748,6 +689,7 @@
               </div>
 
               <!-- INFORMACIÓN -->
+
               <div class="settings-group">
 
                 <span class="settings-label">TELÉFONO</span>
@@ -784,9 +726,7 @@
 
           </section>
 
-          <!-- =====================================
-               CENTRO DE NOTIFICACIONES
-          ====================================== -->
+          <!-- CENTRO DE NOTIFICACIONES -->
 
           <section
             class="notification-center"
@@ -813,6 +753,7 @@
               <p class="notification-subtitle">Notificaciones</p>
 
               <!-- TARJETA DE MÚSICA -->
+
               <article class="notification-card music-notification" id="music-notification">
 
                 <div class="notification-card-heading">
@@ -854,6 +795,7 @@
               </article>
 
               <!-- MENSAJES RECIBIDOS -->
+
               <div class="notification-section-heading">
                 <span>RECIENTES</span>
                 <button type="button" id="clear-notifications">Borrar</button>
@@ -877,6 +819,7 @@
           </section>
 
           <!-- BARRA INFERIOR -->
+
           <div
             class="phone-home-indicator"
             id="phone-home-indicator"
