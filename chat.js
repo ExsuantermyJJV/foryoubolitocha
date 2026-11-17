@@ -2,6 +2,7 @@
 /* ==========================================
    NUESTRAS ROLITAS - CHAT FIREBASE
    Login + Registro + Chat
+   Acceso global a toda la página.
    Cualquier usuario registrado puede entrar.
    Los correos no se muestran en los mensajes.
 ========================================== */
@@ -62,20 +63,35 @@ const messagesRef = collection(
    3. ELEMENTOS HTML
 ========================================== */
 
-const chatGate = document.getElementById("chat-gate");
+// Acceso global
+const authScreen = document.getElementById("auth-screen");
+const authLoading = document.getElementById("auth-loading");
+const privateContent = document.getElementById("private-content");
 
+// Pantallas de acceso
+const chatGate = document.getElementById("chat-gate");
 const loginForm = document.getElementById("chat-login");
 const registerForm = document.getElementById("chat-register");
 
+// Errores
 const loginError = document.getElementById("chat-login-error");
 const registerError = document.getElementById("register-error");
 
+// Campos de acceso
 const emailInput = document.getElementById("chat-email");
 const passwordInput = document.getElementById("chat-password");
 
 const registerEmail = document.getElementById("register-email");
 const registerPassword = document.getElementById("register-password");
 
+// Navegación de acceso
+const showLoginButton = document.getElementById("show-login");
+const showRegisterButton = document.getElementById("show-register");
+
+const backLoginButton = document.getElementById("back-login");
+const backRegisterButton = document.getElementById("back-register");
+
+// Chat
 const room = document.getElementById("chat-room");
 const logoutButton = document.getElementById("chat-logout");
 
@@ -87,12 +103,6 @@ const messageInput = document.getElementById("chat-message-input");
 const sendButton = document.getElementById("chat-send-button");
 
 const sendError = document.getElementById("chat-send-error");
-
-const showLoginButton = document.getElementById("show-login");
-const showRegisterButton = document.getElementById("show-register");
-
-const backLoginButton = document.getElementById("back-login");
-const backRegisterButton = document.getElementById("back-register");
 
 
 /* ==========================================
@@ -113,6 +123,8 @@ function showStatus(message) {
   }
 }
 
+
+// Ocultar las pantallas internas del acceso/chat.
 function hideAllScreens() {
   if (chatGate) chatGate.hidden = true;
   if (loginForm) loginForm.hidden = true;
@@ -120,7 +132,22 @@ function hideAllScreens() {
   if (room) room.hidden = true;
 }
 
+
+// Mostrar opciones de acceso.
+// La página completa permanece oculta.
 function showGate() {
+  if (privateContent) {
+    privateContent.hidden = true;
+  }
+
+  if (authScreen) {
+    authScreen.hidden = false;
+  }
+
+  if (authLoading) {
+    authLoading.hidden = true;
+  }
+
   hideAllScreens();
 
   if (chatGate) {
@@ -128,7 +155,21 @@ function showGate() {
   }
 }
 
+
+// Mostrar formulario de inicio de sesión.
 function showLogin() {
+  if (privateContent) {
+    privateContent.hidden = true;
+  }
+
+  if (authScreen) {
+    authScreen.hidden = false;
+  }
+
+  if (authLoading) {
+    authLoading.hidden = true;
+  }
+
   hideAllScreens();
 
   if (loginForm) {
@@ -140,7 +181,21 @@ function showLogin() {
   }
 }
 
+
+// Mostrar formulario de registro.
 function showRegister() {
+  if (privateContent) {
+    privateContent.hidden = true;
+  }
+
+  if (authScreen) {
+    authScreen.hidden = false;
+  }
+
+  if (authLoading) {
+    authLoading.hidden = true;
+  }
+
   hideAllScreens();
 
   if (registerForm) {
@@ -152,8 +207,18 @@ function showRegister() {
   }
 }
 
+
+// Mostrar toda la página después de autenticar.
 function showChat() {
   hideAllScreens();
+
+  if (authScreen) {
+    authScreen.hidden = true;
+  }
+
+  if (privateContent) {
+    privateContent.hidden = false;
+  }
 
   if (room) {
     room.hidden = false;
@@ -275,7 +340,6 @@ function renderMessages(snapshot) {
    9. ESCUCHAR MENSAJES EN TIEMPO REAL
 ========================================== */
 
-
 function startMessagesListener(user) {
   if (stopMessagesListener) {
     stopMessagesListener();
@@ -371,7 +435,7 @@ registerForm?.addEventListener("submit", async (event) => {
 
     showStatus("Cuenta creada correctamente");
 
-    // No cerrar sesión: el usuario entra directamente al chat.
+    // onAuthStateChanged mostrará la página automáticamente.
 
   } catch (error) {
     console.error("Error en el registro:", error);
@@ -414,7 +478,9 @@ loginForm?.addEventListener("submit", async (event) => {
   const password = passwordInput?.value || "";
 
   try {
-    showStatus("Verificando acceso...");
+    if (loginError) {
+      loginError.textContent = "Verificando acceso...";
+    }
 
     await signInWithEmailAndPassword(
       auth,
@@ -425,6 +491,8 @@ loginForm?.addEventListener("submit", async (event) => {
     if (passwordInput) {
       passwordInput.value = "";
     }
+
+    // onAuthStateChanged mostrará la página automáticamente.
 
   } catch (error) {
     console.error("Error iniciando sesión:", error);
@@ -454,8 +522,6 @@ loginForm?.addEventListener("submit", async (event) => {
         errors[error.code] ||
         "No se pudo iniciar sesión.";
     }
-
-    showStatus("Acceso no completado");
   }
 });
 
@@ -468,7 +534,7 @@ logoutButton?.addEventListener("click", async () => {
   try {
     await signOut(auth);
 
-    showStatus("Sesión cerrada");
+    // onAuthStateChanged ocultará la página automáticamente.
 
   } catch (error) {
     console.error("Error cerrando sesión:", error);
@@ -528,8 +594,24 @@ sendForm?.addEventListener("submit", async (event) => {
 
 
 /* ==========================================
-   14. CONTROL DE ACCESO FIREBASE
+   14. CONTROL GLOBAL DE ACCESO FIREBASE
 ========================================== */
+
+// Mientras Firebase comprueba la sesión,
+// no se muestra el contenido privado.
+if (authScreen) {
+  authScreen.hidden = false;
+}
+
+if (privateContent) {
+  privateContent.hidden = true;
+}
+
+if (authLoading) {
+  authLoading.hidden = false;
+}
+
+hideAllScreens();
 
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
@@ -551,9 +633,13 @@ onAuthStateChanged(auth, (user) => {
   if (user) {
     // Cualquier usuario autenticado puede entrar.
     showChat();
+
     startMessagesListener(user);
 
   } else {
+    // No hay sesión: bloquear toda la página.
+    currentUser = null;
+
     if (logoutButton) {
       logoutButton.hidden = true;
     }

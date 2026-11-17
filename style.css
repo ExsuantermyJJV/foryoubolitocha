@@ -3447,3 +3447,212 @@ body[data-theme="light"] .notification-message-content p {
   margin-top: 17px !important;
   margin-bottom: 12px !important;
 }
+
+/* ==========================================
+   ACCESO GLOBAL - NUESTRAS ROLITAS
+========================================== */
+
+.auth-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 24px 16px;
+  overflow-y: auto;
+
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(180, 75, 139, .22), transparent 60%),
+    linear-gradient(145deg, #100a18, #1b1022 55%, #0b0812);
+}
+
+.auth-card {
+  width: min(100%, 430px);
+  margin: auto;
+  padding: clamp(25px, 6vw, 42px);
+
+  border: 1px solid rgba(255, 210, 236, .16);
+  border-radius: 28px;
+
+  background: linear-gradient(
+    145deg,
+    rgba(43, 27, 49, .96),
+    rgba(19, 12, 27, .98)
+  );
+
+  box-shadow:
+    0 25px 80px rgba(0, 0, 0, .48),
+    inset 0 1px rgba(255, 255, 255, .07);
+
+  text-align: center;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.auth-heart {
+  margin-bottom: 12px;
+  color: var(--pink-bright);
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.auth-kicker {
+  margin: 0 0 12px;
+  color: var(--pink);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .2em;
+}
+
+.auth-card h1 {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 7vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.auth-description {
+  margin: 13px 0 25px;
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+#auth-loading {
+  margin: 20px 0;
+  color: var(--pink);
+  font-size: .85rem;
+}
+
+#chat-gate,
+#chat-login,
+#chat-register {
+  width: 100%;
+}
+
+#chat-gate {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+#chat-login,
+#chat-register {
+  display: grid;
+  gap: 11px;
+  margin-top: 20px;
+  text-align: left;
+}
+
+.auth-card h3 {
+  margin: 0 0 10px;
+  color: var(--text);
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+}
+
+.auth-card label {
+  color: var(--muted);
+  font-size: .78rem;
+  font-weight: 600;
+}
+
+.auth-card input {
+  width: 100%;
+  min-width: 0;
+  padding: 13px 15px;
+
+  border: 1px solid rgba(255, 210, 236, .16);
+  border-radius: 13px;
+  outline: none;
+
+  background: rgba(255, 255, 255, .055);
+  color: white;
+  font-size: 16px;
+}
+
+.auth-card input:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px rgba(244, 166, 204, .12);
+}
+
+.auth-card button {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+
+  border: 1px solid transparent;
+  border-radius: 13px;
+
+  background: linear-gradient(110deg, #d96ba9, #a34783);
+  color: white;
+
+  font-size: .85rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  transition: transform .2s ease, filter .2s ease;
+}
+
+.auth-card button:hover {
+  filter: brightness(1.12);
+  transform: translateY(-2px);
+}
+
+.auth-card button:active {
+  transform: scale(.98);
+}
+
+#show-register {
+  border-color: rgba(255, 210, 236, .25);
+  background: #fff0f7;
+  color: #a34783;
+}
+
+#back-login,
+#back-register {
+  min-height: 42px;
+  border-color: rgba(255, 210, 236, .16);
+  background: rgba(255, 255, 255, .07);
+  color: var(--muted);
+}
+
+#chat-login-error,
+#register-error {
+  margin: 5px 0 0;
+  color: #ff9db5;
+  font-size: .8rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+  .auth-screen {
+    padding: 18px 14px;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 390px;
+    padding: 30px 23px;
+    border-radius: 23px;
+  }
+
+  #chat-gate {
+    margin-top: 22px;
+  }
+
+  .auth-card button {
+    min-height: 52px;
+    font-size: .9rem;
+  }
+}
