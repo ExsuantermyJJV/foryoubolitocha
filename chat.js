@@ -317,16 +317,27 @@ function ensureReplyComposer() {
     .chat-bubble--mine .chat-reply-quote{background:rgba(255,255,255,.55)}
 
     .chat-reply-target-highlight{outline:2px solid #c47ba6;outline-offset:3px;transition:outline .2s}
-    .chat-bubble{position:relative}
-    .chat-reaction-picker{position:absolute;z-index:30;left:8px;bottom:calc(100% - 3px);display:flex;align-items:center;gap:5px;padding:7px 9px;border:1px solid rgba(173,86,137,.2);border-radius:24px;background:#fff;box-shadow:0 5px 22px rgba(35,20,35,.2);white-space:nowrap}
+    .chat-bubble{position:relative;overflow:visible}
+
+    /* Menú de reacciones: limpio, redondeado y fácil de tocar */
+    .chat-reaction-picker{position:absolute;z-index:40;left:8px;bottom:calc(100% + 8px);display:flex;align-items:center;gap:5px;padding:7px 9px;border:1px solid rgba(173,86,137,.18);border-radius:28px;background:rgba(255,255,255,.98);box-shadow:0 8px 26px rgba(66,35,58,.16);white-space:nowrap;backdrop-filter:blur(10px);animation:rolitasReactionIn .16s ease-out}
     .chat-reaction-picker[hidden]{display:none!important}
-    .chat-reaction-button{display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;border-radius:50%;background:transparent;font-size:22px;cursor:pointer;transition:transform .12s,background .12s}
-    .chat-reaction-button:hover{background:#f8eaf2;transform:scale(1.16)}
-    .chat-reaction-reply{width:auto;padding:0 9px;border-left:1px solid #eadce5;border-radius:0;font-size:11px;font-weight:600;color:#91416f}
-    .chat-reaction-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
-    .chat-reaction-chip{display:inline-flex;align-items:center;gap:4px;min-height:23px;padding:2px 7px;border:1px solid #eadce5;border-radius:14px;background:#fff;font-size:12px;line-height:1;cursor:pointer}
-    .chat-reaction-chip.is-mine{border-color:#bd76a0;background:#fff0f7}
+    .chat-reaction-button{display:grid;place-items:center;width:36px;height:36px;padding:0;border:0;border-radius:50%;background:transparent;font-size:23px;line-height:1;cursor:pointer;transition:transform .15s ease,background .15s ease}
+    .chat-reaction-button:hover{background:#faedf4;transform:translateY(-2px) scale(1.1)}
+    .chat-reaction-button:active{transform:scale(.92)}
+    .chat-reaction-reply{width:auto;height:30px;padding:0 11px;border-left:1px solid #f0e2eb;border-radius:0 18px 18px 0;font-size:11px;font-weight:650;color:#91416f}
+
+    /* Reacciones en el mismo renglón de la hora */
+    #chat-messages .chat-bubble-meta{display:flex!important;align-items:center!important;justify-content:flex-start!important;flex-wrap:nowrap!important;gap:4px;width:100%;box-sizing:border-box}
+    #chat-messages .chat-bubble-meta > time{display:inline-block!important;visibility:visible!important;opacity:1!important;margin-left:auto!important;flex:0 0 auto!important;white-space:nowrap!important}
+    .chat-reaction-list{position:static;z-index:3;display:inline-flex;align-items:center;flex:0 0 auto;flex-wrap:nowrap;gap:3px;margin:0;padding:0;min-height:0;height:18px;line-height:1;vertical-align:middle;pointer-events:auto}
+    .chat-reaction-chip{display:inline-grid;place-items:center;box-sizing:border-box;width:18px;height:18px;min-width:18px;padding:0;border:1px solid #f0dce8;border-radius:50%;background:linear-gradient(145deg,#fff 0%,#fff7fb 100%);box-shadow:0 1px 3px rgba(105,53,84,.10);font-size:11px;line-height:1;cursor:pointer;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease,background .15s ease}
+    .chat-reaction-chip:hover{transform:translateY(-2px);border-color:#d99abc;box-shadow:0 4px 10px rgba(105,53,84,.13)}
+    .chat-reaction-chip.is-mine{border:1.5px solid #c66b9e;background:#ffedf6;box-shadow:0 0 0 3px rgba(198,107,158,.10)}
+    .chat-reaction-chip:focus-visible,.chat-reaction-button:focus-visible{outline:2px solid #bd76a0;outline-offset:2px}
     .chat-reaction-chip:disabled{opacity:.65;cursor:default}
+    @keyframes rolitasReactionIn{from{opacity:0;transform:translateY(5px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @media(prefers-reduced-motion:reduce){.chat-reaction-picker,.chat-reaction-button,.chat-reaction-chip{animation:none;transition:none}}
   `;
 
   document.head.appendChild(style);
@@ -2199,11 +2210,11 @@ function renderMessages(docs, { initial = false } = {}) {
 
     meta.className = "chat-bubble-meta";
 
+    // La hora permanece como hija directa de meta para conservar sus estilos;
+    // el margen automático la alinea a la derecha sin ocultarla.
     const time = document.createElement("time");
 
     time.textContent = formatMessageDate(data.createdAt);
-
-    meta.appendChild(time);
 
     if (mine) {
 
@@ -2248,6 +2259,8 @@ function renderMessages(docs, { initial = false } = {}) {
       meta.appendChild(checks);
 
     }
+
+    meta.appendChild(time);
 
     bubble.append(body, meta);
 
@@ -2294,7 +2307,8 @@ function renderMessages(docs, { initial = false } = {}) {
     bubble.appendChild(reactionPicker);
 
     const reactionList = createReactionList(data, item.id);
-    if (reactionList) bubble.appendChild(reactionList);
+    // La reacción comparte la misma fila de metadatos que la hora y los checks.
+    if (reactionList) meta.insertBefore(reactionList, time);
 
     let longPressTimer = null;
     let longPressTriggered = false;
