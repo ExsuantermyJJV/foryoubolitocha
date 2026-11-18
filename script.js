@@ -147,10 +147,15 @@ function showScreen(appName) {
 
   if (!target) return false;
 
-  // Guardar la posición de la aplicación que se está cerrando.
+  // El chat tiene su propio scroll interno. Guardarlo ANTES de ocultar
+  // la pantalla, porque después sus medidas pueden quedar en cero.
   const currentScreen = getScreen(currentApp);
 
   if (currentScreen && currentScreen !== target) {
+    if (currentApp === "messages") {
+      window.saveChatScrollPosition?.();
+    }
+
     appScrollPositions.set(currentApp, currentScreen.scrollTop);
   }
 
@@ -162,18 +167,20 @@ function showScreen(appName) {
   currentApp = appName;
   document.body.dataset.currentApp = appName;
 
-  // Restaurar la posición anterior. Si nunca se abrió, empieza arriba.
+  // Restaurar el scroll general de la aplicación.
   const savedScrollTop = appScrollPositions.get(appName) ?? 0;
 
   requestAnimationFrame(() => {
-    // Evitar modificar una pantalla si el usuario ya cambió de aplicación.
-    if (currentApp === appName && !target.hidden) {
-      target.scrollTop = savedScrollTop;
+    if (currentApp !== appName || target.hidden) return;
+
+    target.scrollTop = savedScrollTop;
+
+    // Restaurar el scroll interno de la conversación cuando ya está visible.
+    if (appName === "messages") {
+      window.restoreChatScrollPosition?.();
     }
   });
 
-  // Al entrar en Mensajes se marca como leído, conservando el contador
-  // y la lógica que gestiona el resto del sistema.
   if (appName === "messages") {
     window.markMessagesAsRead?.();
   }

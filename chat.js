@@ -125,6 +125,7 @@ let scrollUpdateFrame = null;
 
 // Conserva la posición del chat aunque la aplicación esté oculta.
 let savedChatScrollTop = null;
+let hasUserScrolledChat = false;
 let chatRestoreFrame = null;
 
 /* ==========================================
@@ -544,29 +545,19 @@ function restoreChatScrollPosition() {
 
       if (!messagesBox || !isChatScreenVisible()) return;
 
-      if (pendingInitialScroll) {
-        const firstUnread = messagesBox.querySelector(".chat-first-unread");
-
-        if (firstUnread) {
-          const boxRect = messagesBox.getBoundingClientRect();
-          const itemRect = firstUnread.getBoundingClientRect();
-
-          scrollChatTo(
-            messagesBox.scrollTop + itemRect.top - boxRect.top - 5
-          );
-        } else {
-          scrollChatToBottom();
-          markConversationReadIfAtBottom();
-        }
-
+      // Si todavía no existe una posición elegida por el usuario,
+      // siempre iniciar al final de la conversación. No usar scrollTop=0
+      // como posición guardada: al ocultar una pantalla el navegador puede
+      // reportar cero aunque el usuario nunca haya elegido esa posición.
+      if (pendingInitialScroll || !hasUserScrolledChat || savedChatScrollTop === null) {
+        scrollChatToBottom();
         pendingInitialScroll = false;
         savedChatScrollTop = messagesBox.scrollTop;
+        markConversationReadIfAtBottom();
         return;
       }
 
-      if (savedChatScrollTop !== null) {
-        scrollChatTo(savedChatScrollTop);
-      }
+      scrollChatTo(savedChatScrollTop);
     });
   });
 }
@@ -691,7 +682,9 @@ function renderMessages(docs, { initial = false } = {}) {
     ? messagesBox.scrollTop
     : (savedChatScrollTop ?? messagesBox.scrollTop);
 
-  if (screenVisible) savedChatScrollTop = previousScrollTop;
+  if (screenVisible && hasUserScrolledChat) {
+    savedChatScrollTop = previousScrollTop;
+  }
 
   messagesBox.replaceChildren();
 
@@ -746,7 +739,11 @@ function renderMessages(docs, { initial = false } = {}) {
   // No medir ni desplazar elementos mientras la pantalla está oculta.
   if (!screenVisible) {
     if (initial) pendingInitialScroll = true;
-    savedChatScrollTop = previousScrollTop;
+    // No convertir el cero temporal de una pantalla oculta en una
+    // posición válida de lectura.
+    if (hasUserScrolledChat && savedChatScrollTop === null) {
+      savedChatScrollTop = previousScrollTop;
+    }
     return;
   }
 
@@ -757,20 +754,11 @@ function renderMessages(docs, { initial = false } = {}) {
     }
 
     if (initial) {
+      // Al cargar el historial por primera vez, mostrar el final de la
+      // conversación. La posición se guarda para las siguientes entradas.
       pendingInitialScroll = false;
-
-      if (firstUnreadElement) {
-        const boxRect = messagesBox.getBoundingClientRect();
-        const itemRect = firstUnreadElement.getBoundingClientRect();
-
-        scrollChatTo(
-          messagesBox.scrollTop + itemRect.top - boxRect.top - 5
-        );
-      } else {
-        scrollChatToBottom();
-        markConversationReadIfAtBottom();
-      }
-
+      scrollChatToBottom();
+      markConversationReadIfAtBottom();
       savedChatScrollTop = messagesBox.scrollTop;
       return;
     }
@@ -809,8 +797,24 @@ function renderMessages(docs, { initial = false } = {}) {
   });
 }
 
-messagesBox?.addEventListener("scroll", () => {
+function registerUserChatScrollIntent() {
+  if (!isChatScreenVisible()) return;
+  hasUserScrolledChat = true;
   savedChatScrollTop = messagesBox.scrollTop;
+}
+
+messagesBox?.addEventListener("wheel", registerUserChatScrollIntent, { passive: true });
+messagesBox?.addEventListener("touchmove", registerUserChatScrollIntent, { passive: true });
+messagesBox?.addEventListener("keydown", (event) => {
+  if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) {
+    registerUserChatScrollIntent();
+  }
+});
+
+messagesBox?.addEventListener("scroll", () => {
+  if (hasUserScrolledChat && isChatScreenVisible()) {
+    savedChatScrollTop = messagesBox.scrollTop;
+  }
 
   if (scrollUpdateFrame) {
     cancelAnimationFrame(scrollUpdateFrame);
