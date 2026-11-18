@@ -106,6 +106,83 @@ const sendButton = document.getElementById("chat-send-button");
 
 const sendError = document.getElementById("chat-send-error");
 
+// Respuesta a un mensaje (se guarda junto al nuevo mensaje en Firestore).
+let replyingTo = null;
+let replyPreview = null;
+let replyPreviewText = null;
+let replyPreviewAuthor = null;
+let replyCancelButton = null;
+
+function ensureReplyComposer() {
+  if (!sendForm || replyPreview) return;
+
+  replyPreview = document.createElement("div");
+  replyPreview.className = "chat-reply-composer";
+  replyPreview.hidden = true;
+
+  const accent = document.createElement("span");
+  accent.className = "chat-reply-composer-accent";
+
+  const content = document.createElement("div");
+  content.className = "chat-reply-composer-content";
+  replyPreviewAuthor = document.createElement("strong");
+  replyPreviewAuthor.className = "chat-reply-composer-author";
+  replyPreviewText = document.createElement("span");
+  replyPreviewText.className = "chat-reply-composer-text";
+  content.append(replyPreviewAuthor, replyPreviewText);
+
+  replyCancelButton = document.createElement("button");
+  replyCancelButton.type = "button";
+  replyCancelButton.className = "chat-reply-cancel";
+  replyCancelButton.setAttribute("aria-label", "Cancelar respuesta");
+  replyCancelButton.textContent = "×";
+  replyCancelButton.addEventListener("click", clearReplyTarget);
+
+  replyPreview.append(accent, content, replyCancelButton);
+  sendForm.parentNode.insertBefore(replyPreview, sendForm);
+
+  const style = document.createElement("style");
+  style.textContent = `
+    .chat-reply-composer{display:flex;align-items:center;gap:9px;margin:8px 0 0;padding:9px 11px;border:1px solid #efd9e8;border-radius:12px;background:#fff7fb;color:#382b39}
+    .chat-reply-composer[hidden]{display:none!important}
+    .chat-reply-composer-accent{width:3px;align-self:stretch;border-radius:5px;background:#ad5689;flex:none}
+    .chat-reply-composer-content{display:flex;min-width:0;flex:1;flex-direction:column;gap:2px}
+    .chat-reply-composer-author{font-size:10px;color:#91416f}
+    .chat-reply-composer-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:#806a7b}
+    .chat-reply-cancel{border:0;background:transparent;color:#987b91;font-size:21px;line-height:1;cursor:pointer}
+    .chat-reply-quote{display:flex;flex-direction:column;gap:2px;width:100%;margin:0 0 7px;padding:6px 8px;border:0;border-left:3px solid #ad5689;border-radius:5px;background:rgba(173,86,137,.09);text-align:left;cursor:pointer;color:inherit}
+    .chat-reply-quote strong{font-size:9px;color:#91416f}
+    .chat-reply-quote span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;opacity:.8}
+    .chat-bubble{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:pan-y}
+    .chat-bubble:active{filter:brightness(.985)}
+    .chat-bubble--mine .chat-reply-quote{background:rgba(255,255,255,.55)}
+    .chat-reply-target-highlight{outline:2px solid #c47ba6;outline-offset:3px;transition:outline .2s}
+  `;
+  document.head.appendChild(style);
+}
+
+function clearReplyTarget() {
+  replyingTo = null;
+  if (replyPreview) replyPreview.hidden = true;
+  if (messageInput) messageInput.focus();
+}
+
+function setReplyTarget(message) {
+  replyingTo = {
+    messageId: message.id,
+    text: String(message.text || "").slice(0, 1000),
+    senderUid: message.senderUid || "",
+    senderName: message.senderUid === currentUser?.uid ? "Tú" : "La otra persona"
+  };
+  ensureReplyComposer();
+  replyPreviewAuthor.textContent = `Respondiendo a ${replyingTo.senderName}`;
+  replyPreviewText.textContent = replyingTo.text || "Mensaje";
+  replyPreview.hidden = false;
+  messageInput?.focus();
+}
+
+ensureReplyComposer();
+
 /* ==========================================
    4. ESTADO DEL CHAT
 ========================================== */
@@ -713,6 +790,33 @@ function renderMessages(docs, { initial = false } = {}) {
     }`;
     bubble.dataset.messageId = item.id;
 
+    if (data.replyTo && typeof data.replyTo === "object") {
+      const quote = document.createElement("button");
+      quote.type = "button";
+      quote.className = "chat-reply-quote";
+      quote.dataset.replyTargetId = data.replyTo.messageId || "";
+      const quoteAuthor = document.createElement("strong");
+      quoteAuthor.textContent = data.replyTo.senderName || "Mensaje";
+      const quoteText = document.createElement("span");
+      quoteText.textContent = data.replyTo.text || "Mensaje";
+      quote.append(quoteAuthor, quoteText);
+      quote.addEventListener("click", () => {
+        const target = messagesBox.querySelector(
+          `[data-message-id="${CSS.escape(data.replyTo.messageId || "")}"]`
+        );
+        if (target) {
+          const boxRect = messagesBox.getBoundingClientRect();
+          const targetRect = target.getBoundingClientRect();
+          const centeredTop = messagesBox.scrollTop + targetRect.top - boxRect.top -
+            (messagesBox.clientHeight - targetRect.height) / 2;
+          scrollChatTo(centeredTop);
+          target.classList.add("chat-reply-target-highlight");
+          setTimeout(() => target.classList.remove("chat-reply-target-highlight"), 1200);
+        }
+      });
+      bubble.appendChild(quote);
+    }
+
     const body = document.createElement("p");
     body.className = "chat-bubble-text";
     body.textContent = data.text || "";
@@ -725,6 +829,51 @@ function renderMessages(docs, { initial = false } = {}) {
 
     meta.appendChild(time);
     bubble.append(body, meta);
+
+    // Responder al tocar/clicar el mensaje o mantenerlo presionado.
+    // Los botones internos, como la cita de otra respuesta, mantienen su acción.
+    const replyMessage = () => {
+      setReplyTarget({
+        id: item.id,
+        text: data.text || "",
+        senderUid: data.senderUid || ""
+      });
+    };
+
+    let longPressTimer = null;
+    let longPressTriggered = false;
+
+    bubble.addEventListener("pointerdown", (event) => {
+      if (event.target.closest("button")) return;
+
+      longPressTriggered = false;
+      clearTimeout(longPressTimer);
+      longPressTimer = setTimeout(() => {
+        longPressTriggered = true;
+        replyMessage();
+      }, 550);
+    });
+
+    const cancelLongPress = () => {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    };
+
+    bubble.addEventListener("pointerup", cancelLongPress);
+    bubble.addEventListener("pointerleave", cancelLongPress);
+    bubble.addEventListener("pointercancel", cancelLongPress);
+
+    bubble.addEventListener("click", (event) => {
+      if (event.target.closest("button")) return;
+
+      if (longPressTriggered) {
+        longPressTriggered = false;
+        event.preventDefault();
+        return;
+      }
+
+      replyMessage();
+    });
 
     const timestamp = getTimestampMillis(data.createdAt);
 
@@ -1062,10 +1211,12 @@ sendForm?.addEventListener("submit", async (event) => {
       text: text,
       senderUid: currentUser.uid,
       senderName: "Usuario",
-      createdAt: serverTimestamp()
+      createdAt: serverTimestamp(),
+      ...(replyingTo ? { replyTo: { ...replyingTo } } : {})
     });
 
     messageInput.value = "";
+    clearReplyTarget();
     messageInput.focus();
 
   } catch (error) {
