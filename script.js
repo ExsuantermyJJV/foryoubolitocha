@@ -45,33 +45,18 @@ const homeIndicator = $("#phone-home-indicator");
 const phoneClock = $("#phone-clock");
 const homeDate = $("#home-date");
 
-const appScreens = $$("[data-app-screen]");
-const openAppButtons = $$("[data-open-app]");
+// Las aplicaciones pueden añadirse dinámicamente después de cargar este archivo.
+const getAllAppScreens = () => $$("[data-app-screen]");
 const homeButtons = $$("[data-go-home]");
 
-const notificationCenter = $("#notification-center");
-const notificationPanel = $(".notification-panel");
 
-const notificationClock = $("#notification-clock");
-const notificationDate = $("#notification-date");
 
-const notificationCover = $("#notification-cover");
-const notificationSong = $("#notification-song");
-const notificationArtist = $("#notification-artist");
 
-const notificationPlay = $("#notification-play");
-const notificationPrev = $("#notification-prev");
-const notificationNext = $("#notification-next");
 
-const notificationList = $("#notification-list");
-const notificationEmpty = $("#notification-empty");
 
-const notificationClose = $("#close-notifications");
-const notificationClear = $("#clear-notifications");
 
 let currentApp = "home";
 let appHistory = [];
-let notificationOpen = false;
 
 
 /* 3. RELOJ DEL TELÉFONO */
@@ -80,12 +65,6 @@ const clockFormatter = new Intl.DateTimeFormat("es-CO", {
   hour: "numeric",
   minute: "2-digit",
   hour12: true
-});
-
-const timeFormatter = new Intl.DateTimeFormat("es-CO", {
-  hour: "2-digit",
-  minute: "2-digit",
-  hour12: false
 });
 
 const dateFormatter = new Intl.DateTimeFormat("es-CO", {
@@ -110,16 +89,6 @@ function updatePhoneClock() {
 
   if (homeDate) {
     homeDate.textContent = capitalize(dateFormatter.format(now));
-  }
-
-  if (notificationClock) {
-    notificationClock.textContent = timeFormatter.format(now);
-  }
-
-  if (notificationDate) {
-    notificationDate.textContent = dateFormatter
-      .format(now)
-      .toUpperCase();
   }
 }
 
@@ -160,7 +129,7 @@ function showScreen(appName) {
   }
 
   // Mostrar únicamente la aplicación solicitada.
-  appScreens.forEach(screen => {
+  getAllAppScreens().forEach(screen => {
     screen.hidden = screen !== target;
   });
 
@@ -196,10 +165,6 @@ function openApp(appName) {
     return;
   }
 
-  if (notificationOpen) {
-    closeNotifications();
-  }
-
   if (currentApp !== "home") {
     appHistory.push(currentApp);
   }
@@ -208,11 +173,6 @@ function openApp(appName) {
 }
 
 function goBack() {
-  if (notificationOpen) {
-    closeNotifications();
-    return;
-  }
-
   if (currentApp === "home") return;
 
   const previous = appHistory.pop();
@@ -225,19 +185,24 @@ function goBack() {
 }
 
 function goHome() {
-  if (notificationOpen) {
-    closeNotifications();
-  }
-
   appHistory = [];
   showScreen("home");
 }
 
-openAppButtons.forEach(button => {
-  button.addEventListener("click", () => {
-    openApp(button.dataset.openApp);
-  });
+// Delegación: también detecta iconos creados luego por módulos como Juegos.
+phoneScreen?.addEventListener("click", event => {
+  const button = event.target instanceof Element
+    ? event.target.closest("[data-open-app]")
+    : null;
+  if (!button || !phoneScreen.contains(button)) return;
+  event.preventDefault();
+  openApp(button.dataset.openApp);
 });
+
+// API pública para que los módulos dinámicos utilicen la navegación central.
+window.openRolitasApp = openApp;
+window.goRolitasHome = goHome;
+window.goRolitasBack = goBack;
 
 homeButtons.forEach(button => {
   button.addEventListener("click", goHome);
@@ -249,86 +214,6 @@ homeIndicator?.addEventListener("keydown", event => {
   if (event.key === "Enter" || event.key === " ") {
     event.preventDefault();
     goHome();
-  }
-});
-
-
-/* 5. CENTRO DE NOTIFICACIONES */
-
-function updateNotificationMusic() {
-  const track = musicList[trackIndex];
-
-  if (!track) return;
-
-  if (notificationCover) {
-    notificationCover.src = track.img;
-    notificationCover.alt = `Portada de ${track.name}`;
-  }
-
-  if (notificationSong) {
-    notificationSong.textContent = track.name;
-  }
-
-  if (notificationArtist) {
-    notificationArtist.textContent = track.artist;
-  }
-
-  if (notificationPlay) {
-    notificationPlay.innerHTML = currentTrack.paused
-      ? '<i class="fa-solid fa-play"></i>'
-      : '<i class="fa-solid fa-pause"></i>';
-
-    notificationPlay.setAttribute(
-      "aria-label",
-      currentTrack.paused ? "Reproducir" : "Pausar"
-    );
-  }
-}
-
-function openNotifications() {
-  if (!notificationCenter || notificationOpen) return;
-
-  notificationOpen = true;
-
-  updatePhoneClock();
-  updateNotificationMusic();
-
-  notificationCenter.hidden = false;
-  notificationCenter.setAttribute("aria-hidden", "false");
-
-  requestAnimationFrame(() => {
-    notificationCenter.classList.add("is-open");
-  });
-}
-
-function closeNotifications() {
-  if (!notificationCenter || !notificationOpen) return;
-
-  notificationOpen = false;
-  notificationCenter.classList.remove("is-open");
-  notificationCenter.setAttribute("aria-hidden", "true");
-
-  setTimeout(() => {
-    if (!notificationOpen) {
-      notificationCenter.hidden = true;
-    }
-  }, 450);
-}
-
-window.openRolitasNotifications = openNotifications;
-window.closeRolitasNotifications = closeNotifications;
-
-notificationClose?.addEventListener("click", closeNotifications);
-
-notificationClear?.addEventListener("click", () => {
-  if (!notificationList) return;
-
-  $$(".notification-message", notificationList).forEach(item => {
-    item.remove();
-  });
-
-  if (notificationEmpty) {
-    notificationEmpty.hidden = false;
   }
 });
 
@@ -348,21 +233,15 @@ const gesture = {
 };
 
 const GESTURE_CONFIG = {
-  topZone: 95,
-  bottomZone: 75,
+bottomZone: 75,
   leftZone: 35,
-  openDistance: 55,
-  closeDistance: 65,
-  backDistance: 85,
+backDistance: 85,
   homeDistance: 75
 };
 
 function getGestureZone(x, y, bounds) {
   const localY = y - bounds.top;
   const localX = x - bounds.left;
-
-  if (notificationOpen) return "notification";
-  if (localY <= GESTURE_CONFIG.topZone) return "top";
 
   if (localY >= bounds.height - GESTURE_CONFIG.bottomZone) {
     return "bottom";
@@ -386,7 +265,7 @@ function startGesture(event) {
 
   if (
     targetElement.closest(
-      ".notification-music-controls, .notification-section-heading, .app-grid, .player-card, .chat-send-form"
+      ".app-grid, .player-card, .chat-send-form"
     )
   ) {
     return;
@@ -424,20 +303,6 @@ function moveGesture(event) {
   if (Math.abs(deltaX) > 12 || Math.abs(deltaY) > 12) {
     gesture.moved = true;
   }
-
-  if (gesture.zone === "none") return;
-
-  if (gesture.zone === "top") {
-    if (deltaY > 12 && Math.abs(deltaY) > Math.abs(deltaX)) {
-      event.preventDefault();
-    }
-  }
-
-  if (gesture.zone === "notification") {
-    if (deltaY < -12 && Math.abs(deltaY) > Math.abs(deltaX)) {
-      event.preventDefault();
-    }
-  }
 }
 
 function endGesture(event) {
@@ -453,29 +318,9 @@ function endGesture(event) {
   gesture.pointerId = null;
 
   if (Math.abs(deltaX) > Math.abs(deltaY) * 1.25) {
-    if (
-      zone === "left" &&
-      deltaX > GESTURE_CONFIG.backDistance
-    ) {
+    if (zone === "left" && deltaX > GESTURE_CONFIG.backDistance) {
       goBack();
     }
-
-    return;
-  }
-
-  if (
-    zone === "top" &&
-    deltaY > GESTURE_CONFIG.openDistance
-  ) {
-    openNotifications();
-    return;
-  }
-
-  if (
-    zone === "notification" &&
-    deltaY < -GESTURE_CONFIG.closeDistance
-  ) {
-    closeNotifications();
     return;
   }
 
@@ -518,59 +363,12 @@ if (phoneScreen) {
 }
 
 
-/* 7. APERTURA CON CLIC EN PC */
-
-phoneScreen?.addEventListener("click", event => {
-  if (notificationOpen) return;
-  if (isTyping(event.target)) return;
-
-  const targetElement = event.target instanceof Element
-    ? event.target
-    : null;
-
-  if (!targetElement) return;
-
-  if (
-    targetElement.closest(
-      "button, input, select, textarea, label, a, .app-grid, .player-card, .firebase-chat"
-    )
-  ) {
-    return;
-  }
-
-  const bounds = phoneScreen.getBoundingClientRect();
-  const localY = event.clientY - bounds.top;
-
-  if (localY <= GESTURE_CONFIG.topZone) {
-    openNotifications();
-  }
-});
-
-$("#dynamic-island")?.addEventListener("click", () => {
-  if (notificationOpen) {
-    closeNotifications();
-  } else {
-    openNotifications();
-  }
-});
-
-
 /* 8. TECLADO Y NAVEGACIÓN EN PC */
 
 document.addEventListener("keydown", event => {
   if (isTyping(event.target)) return;
 
-  if (event.key === "Escape") {
-    if (notificationOpen) {
-      closeNotifications();
-    } else {
-      goBack();
-    }
-
-    return;
-  }
-
-  if (event.key === "Backspace") {
+  if (event.key === "Escape" || event.key === "Backspace") {
     event.preventDefault();
     goBack();
     return;
@@ -727,77 +525,8 @@ window.addEventListener("storage", event => {
 updateUnreadBadge(unreadCount);
 
 
-/* 10. NOTIFICACIONES DE MENSAJES */
-
-function addMessageNotification(message, sender = "Mensajes") {
-  if (!notificationList) return;
-
-  const item = document.createElement("article");
-  item.className = "notification-message";
-  item.tabIndex = 0;
-  item.setAttribute("role", "button");
-  item.setAttribute("aria-label", "Abrir mensajes");
-
-  const icon = document.createElement("div");
-  icon.className = "notification-message-icon";
-  icon.innerHTML = '<i class="fa-solid fa-message"></i>';
-
-  const content = document.createElement("div");
-  content.className = "notification-message-content";
-
-  const header = document.createElement("div");
-  header.className = "notification-message-header";
-
-  const title = document.createElement("strong");
-  title.textContent = sender;
-
-  const time = document.createElement("time");
-  time.textContent = timeFormatter.format(new Date());
-
-  const text = document.createElement("p");
-  text.textContent = String(message || "Te ha llegado un mensaje.");
-
-  header.append(title, time);
-  content.append(header, text);
-  item.append(icon, content);
-
-  notificationList.prepend(item);
-
-  if (notificationEmpty) {
-    notificationEmpty.hidden = true;
-  }
-
-  const items = $$(".notification-message", notificationList);
-
-  if (items.length > 15) {
-    items[items.length - 1].remove();
-  }
-
-  item.addEventListener("click", () => {
-    closeNotifications();
-
-    if (currentApp !== "messages") {
-      openApp("messages");
-    }
-  });
-
-  item.addEventListener("keydown", event => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      item.click();
-    }
-  });
-}
-
-window.addEventListener("rolitas:incoming-message", event => {
-  const detail = event.detail || {};
-
-  addMessageNotification(
-    detail.text || "Te ha llegado un mensaje.",
-    detail.sender || "Mensajes"
-  );
-
-  // No mostrar contador si el usuario ya está dentro del chat.
+/* 10. MENSAJES RECIBIDOS: SOLO CONTADOR DE NO LEÍDOS */
+window.addEventListener("rolitas:incoming-message", () => {
   if (currentApp !== "messages") {
     updateUnreadBadge(unreadCount + 1);
   }
@@ -966,10 +695,179 @@ themeModeSelect?.addEventListener("change", event => {
   saveCustomization();
 });
 
-resetCustomizationButton?.addEventListener("click", () => {
-  const confirmed = confirm(
-    "¿Quieres restaurar el fondo, color y tema originales?"
-  );
+function showRestoreAppearanceDialog() {
+  return new Promise(resolve => {
+    // Evita abrir dos diálogos si se pulsa varias veces.
+    const existing = document.getElementById("rolitas-restore-dialog");
+    if (existing) {
+      existing.remove();
+    }
+
+    const styleId = "rolitas-restore-dialog-styles";
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement("style");
+      style.id = styleId;
+      style.textContent = `
+        #rolitas-restore-dialog {
+          position: fixed;
+          inset: 0;
+          z-index: 99999;
+          display: grid;
+          place-items: center;
+          padding: 22px;
+          background: rgba(8, 5, 12, .68);
+          -webkit-backdrop-filter: blur(12px);
+          backdrop-filter: blur(12px);
+          animation: rolitasRestoreFade .18s ease-out;
+        }
+
+        #rolitas-restore-dialog .restore-card {
+          width: min(100%, 330px);
+          padding: 23px 21px 18px;
+          color: #fff7fc;
+          text-align: center;
+          background:
+            radial-gradient(circle at 100% 0%, rgba(217,107,169,.16), transparent 48%),
+            linear-gradient(155deg, #291b2d, #17111e 78%);
+          border: 1px solid rgba(255,255,255,.13);
+          border-radius: 25px;
+          box-shadow: 0 22px 70px rgba(0,0,0,.48),
+                      inset 0 1px 0 rgba(255,255,255,.08);
+          animation: rolitasRestorePop .22s cubic-bezier(.2,.8,.2,1);
+        }
+
+        #rolitas-restore-dialog .restore-icon {
+          width: 52px;
+          height: 52px;
+          display: grid;
+          place-items: center;
+          margin: 0 auto 14px;
+          color: #f08ac8;
+          font-size: 22px;
+          background: rgba(217,107,169,.13);
+          border: 1px solid rgba(240,138,200,.22);
+          border-radius: 17px;
+        }
+
+        #rolitas-restore-dialog h2 {
+          margin: 0 0 9px;
+          font-family: Georgia, serif;
+          font-size: 22px;
+          line-height: 1.2;
+          font-weight: 700;
+        }
+
+        #rolitas-restore-dialog p {
+          margin: 0;
+          color: rgba(255,247,252,.72);
+          font: 500 13px/1.55 "DM Sans", system-ui, sans-serif;
+        }
+
+        #rolitas-restore-dialog .restore-actions {
+          display: flex;
+          gap: 10px;
+          margin-top: 22px;
+        }
+
+        #rolitas-restore-dialog button {
+          min-height: 45px;
+          flex: 1;
+          border: 1px solid rgba(255,255,255,.12);
+          border-radius: 14px;
+          font: 700 13px "DM Sans", system-ui, sans-serif;
+          cursor: pointer;
+          transition: transform .15s ease, filter .15s ease;
+        }
+
+        #rolitas-restore-dialog button:active {
+          transform: scale(.97);
+        }
+
+        #rolitas-restore-dialog .restore-cancel {
+          color: #f6eaf2;
+          background: rgba(255,255,255,.07);
+        }
+
+        #rolitas-restore-dialog .restore-confirm {
+          color: white;
+          background: linear-gradient(135deg, #df70b7, #a84db4);
+          border-color: rgba(255,255,255,.12);
+          box-shadow: 0 7px 18px rgba(194,83,167,.2);
+        }
+
+        @keyframes rolitasRestoreFade {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes rolitasRestorePop {
+          from { opacity: 0; transform: translateY(8px) scale(.96); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          #rolitas-restore-dialog,
+          #rolitas-restore-dialog .restore-card {
+            animation: none;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    const overlay = document.createElement("div");
+    overlay.id = "rolitas-restore-dialog";
+    overlay.setAttribute("role", "presentation");
+    overlay.innerHTML = `
+      <section class="restore-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="rolitas-restore-title"
+        aria-describedby="rolitas-restore-description">
+        <div class="restore-icon" aria-hidden="true">
+          <i class="fa-solid fa-arrow-rotate-left"></i>
+        </div>
+        <h2 id="rolitas-restore-title">¿Volver al original?</h2>
+        <p id="rolitas-restore-description">
+          Se restaurarán el fondo, el color y el tema predeterminados del teléfono.
+        </p>
+        <div class="restore-actions">
+          <button type="button" class="restore-cancel">Cancelar</button>
+          <button type="button" class="restore-confirm">Restaurar</button>
+        </div>
+      </section>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const cancelButton = overlay.querySelector(".restore-cancel");
+    const confirmButton = overlay.querySelector(".restore-confirm");
+
+    const finish = confirmed => {
+      overlay.remove();
+      document.removeEventListener("keydown", onKeyDown);
+      resolve(confirmed);
+    };
+
+    const onKeyDown = event => {
+      if (event.key === "Escape") {
+        finish(false);
+      }
+    };
+
+    cancelButton.addEventListener("click", () => finish(false));
+    confirmButton.addEventListener("click", () => finish(true));
+    overlay.addEventListener("click", event => {
+      if (event.target === overlay) finish(false);
+    });
+    document.addEventListener("keydown", onKeyDown);
+
+    cancelButton.focus();
+  });
+}
+
+resetCustomizationButton?.addEventListener("click", async () => {
+  const confirmed = await showRestoreAppearanceDialog();
 
   if (!confirmed) return;
 
@@ -1147,12 +1045,6 @@ function applyTrackTheme(track) {
     playerCard.style.setProperty("--song-deep", deep);
     playerCard.style.setProperty("--song-accent", accent);
   }
-
-  if (notificationPanel) {
-    notificationPanel.style.setProperty("--song-glow", glow);
-    notificationPanel.style.setProperty("--song-deep", deep);
-    notificationPanel.style.setProperty("--song-accent", accent);
-  }
 }
 
 
@@ -1173,7 +1065,6 @@ function updatePlayButton() {
   trackArt?.classList.toggle("rotate", isPlaying);
   wave?.classList.toggle("loader", isPlaying);
 
-  updateNotificationMusic();
 }
 
 function updateModeButtons() {
@@ -1413,20 +1304,6 @@ currentTrack.addEventListener("error", () => {
   );
 });
 
-["play", "pause", "ended", "loadedmetadata"].forEach(eventName => {
-  currentTrack.addEventListener(eventName, updateNotificationMusic);
-});
-
-
-/* 20. CONTROLES DE MÚSICA EN NOTIFICACIONES */
-
-notificationPlay?.addEventListener("click", playPauseTrack);
-
-notificationNext?.addEventListener("click", nextTrack);
-
-notificationPrev?.addEventListener("click", previousTrack);
-
-
 /* 21. CARTA SORPRESA */
 
 function initLetter() {
@@ -1454,8 +1331,7 @@ function initLetter() {
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden) {
     updatePhoneClock();
-    updateNotificationMusic();
-    updateProgress();
+      updateProgress();
   }
 });
 
@@ -1474,14 +1350,6 @@ function initializePhone() {
   initLetter();
 
   updatePhoneClock();
-
-  updateNotificationMusic();
-
-  if (notificationCenter) {
-    notificationCenter.hidden = true;
-    notificationCenter.classList.remove("is-open");
-    notificationCenter.setAttribute("aria-hidden", "true");
-  }
 
   console.log(
     "Nuestras rolitas: sistema del teléfono inicializado correctamente."

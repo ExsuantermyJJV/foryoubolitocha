@@ -1,0 +1,423 @@
+/* ==========================================================
+   NUESTRAS ROLITAS · JUEGOS
+   Tema premium: midnight plum + neon candy
+   Archivo: juegos.css
+   ========================================================== */
+
+#rolitas-games-screen {
+  --rg-bg: #100b19;
+  --rg-panel: rgba(37, 25, 48, .92);
+  --rg-panel-2: rgba(51, 31, 63, .88);
+  --rg-border: rgba(255, 255, 255, .12);
+  --rg-text: #fff8ff;
+  --rg-muted: #cbbbd2;
+  --rg-pink: #f16ab8;
+  --rg-violet: #9d78ff;
+  --rg-cyan: #65d9e8;
+  --rg-gold: #ffc56e;
+  position: relative !important;
+  inset: auto !important;
+  z-index: 5 !important;
+  display: flex !important;
+  flex: 1 1 0 !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  padding: 0 16px 38px !important;
+  box-sizing: border-box !important;
+  color: var(--rg-text) !important;
+  /* Fondo integrado con el fondo general del teléfono:
+     sin una franja morada fuerte ni un corte brusco de color. */
+  background:
+    radial-gradient(ellipse at 88% 8%, rgba(153, 73, 126, .075), transparent 48%),
+    linear-gradient(160deg, rgba(27, 20, 33, .12), rgba(16, 12, 23, .08)) !important;
+  font-family: "DM Sans", system-ui, sans-serif !important;
+
+  /* El contenido sigue desplazándose, pero sin mostrar la barra lateral. */
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  -webkit-overflow-scrolling: touch;
+}
+#rolitas-games-screen[hidden] { display: none !important; }
+#rolitas-games-screen::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+#rolitas-games-screen *,
+#rolitas-games-screen *::before,
+#rolitas-games-screen *::after { box-sizing: border-box; }
+
+/* El encabezado utiliza .app-header, .app-back y .app-header-kicker
+   definidos en style.css para mantener la identidad visual compartida. */
+
+#rolitas-games-screen .rg-intro { padding: 20px 0 15px !important; }
+#rolitas-games-screen .rg-intro h3 {
+  margin: 0 0 7px !important;
+  color: #fff8ff !important;
+  font-family: "Playfair Display", Georgia, serif !important;
+  font-size: 23px !important;
+  line-height: 1.18 !important;
+  font-weight: 700 !important;
+}
+#rolitas-games-screen .rg-muted {
+  margin: 5px 0 !important;
+  color: var(--rg-muted) !important;
+  font-size: 12px !important;
+  line-height: 1.55 !important;
+  font-weight: 450 !important;
+}
+#rolitas-games-screen .rg-small {
+  color: #ad9bb7 !important;
+  font-size: 10px !important;
+  line-height: 1.45 !important;
+}
+#rolitas-games-screen .rg-status {
+  margin: 13px 0 !important;
+  padding: 11px 13px !important;
+  color: #f9c7e5 !important;
+  background: rgba(241,106,184,.10) !important;
+  border: 1px solid rgba(241,106,184,.20) !important;
+  border-radius: 13px !important;
+  font-size: 11px !important;
+  line-height: 1.5 !important;
+}
+
+#rolitas-games-screen .rg-tabs {
+  display: flex !important;
+  gap: 7px !important;
+  margin: 12px 0 16px !important;
+  padding: 4px !important;
+  overflow-x: auto !important;
+  border-radius: 16px !important;
+  background: rgba(255,255,255,.055) !important;
+  border: 1px solid rgba(255,255,255,.07) !important;
+  scrollbar-width: none;
+}
+#rolitas-games-screen .rg-tabs::-webkit-scrollbar { display: none; }
+#rolitas-games-screen .rg-tab {
+  flex: 1 0 auto !important;
+  min-height: 42px !important;
+  padding: 10px 14px !important;
+  border: 1px solid transparent !important;
+  border-radius: 12px !important;
+  color: #d8c9df !important;
+  background: transparent !important;
+  font-family: "DM Sans", system-ui, sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: .2s ease !important;
+}
+#rolitas-games-screen .rg-tab.active {
+  color: #fff !important;
+  background: linear-gradient(135deg, #e76ab5, #a64dc2) !important;
+  border-color: rgba(255,255,255,.16) !important;
+  box-shadow: 0 5px 16px rgba(194,75,163,.28) !important;
+}
+
+#rolitas-games-screen .rg-card {
+  position: relative !important;
+  margin: 10px 0 !important;
+  padding: 16px !important;
+  overflow: hidden !important;
+  border: 1px solid var(--rg-border) !important;
+  border-radius: 20px !important;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.105), rgba(255,255,255,.035)) !important;
+  box-shadow: 0 12px 28px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.055) !important;
+}
+#rolitas-games-screen .rg-card::before {
+  content: "" !important;
+  position: absolute !important;
+  top: -42px !important;
+  right: -35px !important;
+  width: 112px !important;
+  height: 112px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle, rgba(231,106,181,.16), transparent 70%) !important;
+  pointer-events: none !important;
+}
+#rolitas-games-screen .rg-card h4 {
+  margin: 0 0 5px !important;
+  color: #fff !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+}
+#rolitas-games-screen .rg-card p { margin: 7px 0 11px !important; }
+#rolitas-games-screen .rg-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 9px !important;
+}
+#rolitas-games-screen .rg-tag {
+  flex: 0 0 auto !important;
+  padding: 6px 9px !important;
+  color: #ffc0e5 !important;
+  background: rgba(224,92,177,.17) !important;
+  border: 1px solid rgba(241,106,184,.19) !important;
+  border-radius: 30px !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+  letter-spacing: .65px !important;
+}
+
+#rolitas-games-screen .rg-btn {
+  min-height: 42px !important;
+  padding: 11px 15px !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-radius: 13px !important;
+  color: #fff !important;
+  background: linear-gradient(135deg, #e56bb4 0%, #a34db5 100%) !important;
+  box-shadow: 0 7px 18px rgba(184,72,157,.24) !important;
+  font-family: "DM Sans", system-ui, sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  transition: transform .18s ease, filter .18s ease, box-shadow .18s ease !important;
+}
+#rolitas-games-screen .rg-btn:active { transform: scale(.97) !important; }
+#rolitas-games-screen .rg-btn.secondary {
+  color: #f4eafa !important;
+  background: rgba(255,255,255,.075) !important;
+  border: 1px solid rgba(255,255,255,.15) !important;
+  box-shadow: none !important;
+}
+#rolitas-games-screen .rg-btn:disabled { opacity: .42 !important; cursor: not-allowed !important; }
+
+#rolitas-games-screen #rg-home > h4 {
+  margin: 21px 0 9px !important;
+  color: #fbeefa !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: .1px !important;
+}
+#rolitas-games-screen .rg-list { display: grid !important; gap: 9px !important; }
+#rolitas-games-screen .rg-empty {
+  padding: 21px 14px !important;
+  color: #c7b6cf !important;
+  background: rgba(255,255,255,.025) !important;
+  border: 1px dashed rgba(231,190,232,.22) !important;
+  border-radius: 17px !important;
+  text-align: center !important;
+  font-size: 11px !important;
+  line-height: 1.6 !important;
+}
+#rolitas-games-screen .rg-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 9px !important;
+  margin-top: 13px !important;
+}
+
+#rolitas-games-screen .rg-game-panel { padding: 2px 0 30px !important; }
+#rolitas-games-screen .rg-form {
+  display: grid !important;
+  gap: 10px !important;
+  margin-top: 12px !important;
+}
+#rolitas-games-screen .rg-form label {
+  margin: 3px 0 -4px !important;
+  color: #e9d8ee !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: .2px !important;
+}
+#rolitas-games-screen .rg-input,
+#rolitas-games-screen .rg-select {
+  display: block !important;
+  width: 100% !important;
+  min-height: 49px !important;
+  padding: 13px 14px !important;
+  color: #fff7ff !important;
+  background: rgba(255,255,255,.075) !important;
+  border: 1px solid rgba(255,255,255,.17) !important;
+  border-radius: 14px !important;
+  outline: none !important;
+  font-family: "DM Sans", system-ui, sans-serif !important;
+  font-size: 13px !important;
+  box-shadow: inset 0 2px 7px rgba(0,0,0,.10) !important;
+}
+#rolitas-games-screen .rg-input::placeholder { color: #a995b0 !important; opacity: 1 !important; }
+#rolitas-games-screen .rg-input:focus,
+#rolitas-games-screen .rg-select:focus {
+  border-color: #e879bd !important;
+  box-shadow: 0 0 0 3px rgba(232,121,189,.15) !important;
+}
+#rolitas-games-screen .rg-input option,
+#rolitas-games-screen .rg-select option { color: #24152d !important; }
+
+#rolitas-games-screen .rg-canvas-wrap {
+  width: 100% !important;
+  margin: 2px 0 7px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255,255,255,.22) !important;
+  border-radius: 17px !important;
+  background: #fff !important;
+  box-shadow: 0 10px 26px rgba(0,0,0,.25) !important;
+  touch-action: none !important;
+}
+#rolitas-games-screen #rg-draw-canvas,
+#rolitas-games-screen #rg-view-canvas {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 720 / 460 !important;
+  background: #fff !important;
+  touch-action: none !important;
+  cursor: crosshair !important;
+}
+#rolitas-games-screen .rg-colors {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 11px !important;
+  margin: 8px 0 12px !important;
+  padding: 8px 3px !important;
+}
+#rolitas-games-screen .rg-color {
+  flex: 0 0 24px !important;
+  width: 24px !important;
+  height: 24px !important;
+  padding: 0 !important;
+  border: 2px solid rgba(255,255,255,.75) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 7px rgba(0,0,0,.25) !important;
+  cursor: pointer !important;
+}
+#rolitas-games-screen .rg-color.selected {
+  outline: 2px solid #f4a6d4 !important;
+  outline-offset: 3px !important;
+  transform: scale(1.08) !important;
+}
+#rolitas-games-screen #rg-clear-canvas { min-height: 40px !important; padding: 8px 14px !important; }
+
+#rolitas-games-screen .rg-hangman {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 145px !important;
+  margin: 10px 0 !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+  border-radius: 18px !important;
+  background: linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.02)) !important;
+}
+#rolitas-games-screen .rg-hangman svg { width: 190px !important; max-width: 100% !important; height: 130px !important; }
+#rolitas-games-screen .rg-word {
+  margin: 19px 0 !important;
+  color: #ffd1eb !important;
+  font-size: clamp(20px, 6vw, 27px) !important;
+  font-weight: 900 !important;
+  letter-spacing: 6px !important;
+  line-height: 1.6 !important;
+  text-align: center !important;
+  overflow-wrap: anywhere !important;
+  text-shadow: 0 0 22px rgba(241,106,184,.25) !important;
+}
+#rolitas-games-screen .rg-keyboard {
+  display: grid !important;
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  margin: 15px 0 !important;
+}
+#rolitas-games-screen .rg-key {
+  min-width: 0 !important;
+  min-height: 39px !important;
+  padding: 6px 0 !important;
+  color: #fff !important;
+  background: linear-gradient(145deg, rgba(255,255,255,.14), rgba(255,255,255,.06)) !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  border-radius: 10px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+#rolitas-games-screen .rg-key:disabled { opacity: .28 !important; filter: grayscale(1) !important; }
+
+#rolitas-games-screen .rg-guess-list {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 7px !important;
+  margin: 12px 0 !important;
+}
+#rolitas-games-screen .rg-guess {
+  padding: 7px 10px !important;
+  color: #f8e8f6 !important;
+  background: rgba(255,255,255,.09) !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+  border-radius: 9px !important;
+  font-size: 10px !important;
+}
+#rolitas-games-screen button:focus-visible,
+#rolitas-games-screen input:focus-visible {
+  outline: 2px solid #f7a6d4 !important;
+  outline-offset: 3px !important;
+}
+
+@media (max-width: 360px) {
+  #rolitas-games-screen { padding-right: 12px !important; padding-left: 12px !important; }
+  #rolitas-games-screen .rg-card { padding: 13px !important; }
+  #rolitas-games-screen .rg-tab { padding-right: 10px !important; padding-left: 10px !important; }
+  #rolitas-games-screen .rg-keyboard { gap: 4px !important; }
+  #rolitas-games-screen .rg-key { min-height: 36px !important; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #rolitas-games-screen .rg-card { animation: rg-rise .32s ease both; }
+  @keyframes rg-rise {
+    from { opacity: 0; transform: translateY(7px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Integración: el módulo es una pantalla flex dentro del teléfono. */
+#rolitas-games-screen {
+  position: relative !important;
+  inset: auto !important;
+  display: flex !important;
+  flex: 1 1 0 !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: none !important;
+  z-index: 5 !important;
+  border-radius: 0 0 30px 30px !important;
+  padding-top: 0 !important;
+  padding-bottom: 42px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+
+/* ==========================================================
+   AJUSTE FINO DE ESPACIADO SUPERIOR
+   Reduce el hueco entre el encabezado y el contenido.
+   ========================================================== */
+#rolitas-games-screen > .app-header {
+  min-height: 55px !important;
+  margin: 0 0 6px !important;
+  padding: 0 1px !important;
+}
+
+#rolitas-games-screen #rg-home {
+  padding-top: 2px !important;
+}
+
+#rolitas-games-screen .rg-intro {
+  padding: 8px 0 12px !important;
+}
+
+#rolitas-games-screen .rg-intro h3 {
+  margin-top: 0 !important;
+  margin-bottom: 6px !important;
+}
+
+#rolitas-games-screen .rg-tabs {
+  margin-top: 8px !important;
+}

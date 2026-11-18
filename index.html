@@ -19,9 +19,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="chat.css">
-
+<link rel="stylesheet" href="juegos.css">
   <script src="script.js" defer></script>
   <script type="module" src="chat.js"></script>
+  <script type="module" src="juegos.js"></script>
 </head>
 
 <body>
@@ -726,97 +727,7 @@
 
           </section>
 
-          <!-- CENTRO DE NOTIFICACIONES -->
-
-          <section
-            class="notification-center"
-            id="notification-center"
-            aria-label="Centro de notificaciones"
-            aria-hidden="true"
-            hidden
-          >
-
-            <div class="notification-panel">
-
-              <div class="notification-handle"></div>
-
-              <div class="notification-top">
-                <span id="notification-date">MARTES, 17 DE NOVIEMBRE</span>
-
-                <button type="button" id="close-notifications" aria-label="Cerrar notificaciones">
-                  <i class="fa-solid fa-chevron-up"></i>
-                </button>
-              </div>
-
-              <div class="notification-clock" id="notification-clock">16:45</div>
-
-              <p class="notification-subtitle">Notificaciones</p>
-
-              <!-- TARJETA DE MÚSICA -->
-
-              <article class="notification-card music-notification" id="music-notification">
-
-                <div class="notification-card-heading">
-                  <span><i class="fa-solid fa-music"></i> REPRODUCIENDO</span>
-                  <span class="notification-now">AHORA</span>
-                </div>
-
-                <div class="notification-music-content">
-
-                  <img
-                    id="notification-cover"
-                    src="img/cafune.jpg"
-                    alt="Portada de la canción"
-                  >
-
-                  <div class="notification-music-info">
-                    <strong id="notification-song">Nuestras rolitas</strong>
-                    <small id="notification-artist">Selecciona una canción</small>
-                  </div>
-
-                </div>
-
-                <div class="notification-music-controls">
-
-                  <button type="button" id="notification-prev" aria-label="Anterior">
-                    <i class="fa-solid fa-backward-step"></i>
-                  </button>
-
-                  <button type="button" id="notification-play" aria-label="Reproducir o pausar">
-                    <i class="fa-solid fa-play"></i>
-                  </button>
-
-                  <button type="button" id="notification-next" aria-label="Siguiente">
-                    <i class="fa-solid fa-forward-step"></i>
-                  </button>
-
-                </div>
-
-              </article>
-
-              <!-- MENSAJES RECIBIDOS -->
-
-              <div class="notification-section-heading">
-                <span>RECIENTES</span>
-                <button type="button" id="clear-notifications">Borrar</button>
-              </div>
-
-              <div id="notification-list" class="notification-list">
-
-                <div class="notification-empty" id="notification-empty">
-                  <i class="fa-regular fa-bell-slash"></i>
-                  <span>No tienes notificaciones nuevas</span>
-                </div>
-
-              </div>
-
-              <div class="notification-bottom">
-                <span>Desliza hacia arriba para cerrar</span>
-              </div>
-
-            </div>
-
-          </section>
+          <!-- Centro de notificaciones eliminado. -->
 
           <!-- BARRA INFERIOR -->
 
