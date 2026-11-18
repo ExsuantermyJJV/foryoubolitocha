@@ -169,7 +169,7 @@ function clearReplyTarget() {
 
 function setReplyTarget(message) {
   replyingTo = {
-    messageId: message.id,
+    messageId: message.messageId || message.id,
     text: String(message.text || "").slice(0, 1000),
     senderUid: message.senderUid || "",
     senderName: message.senderUid === currentUser?.uid ? "Tú" : "La otra persona"
@@ -834,7 +834,7 @@ function renderMessages(docs, { initial = false } = {}) {
     // Los botones internos, como la cita de otra respuesta, mantienen su acción.
     const replyMessage = () => {
       setReplyTarget({
-        id: item.id,
+        messageId: item.id,
         text: data.text || "",
         senderUid: data.senderUid || ""
       });
