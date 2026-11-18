@@ -172,7 +172,7 @@
 
   transition:
 
-    *background* .2s ease,
+    background .2s ease,
 
     border-color .2s ease,
 
@@ -340,7 +340,7 @@
 
     box-shadow .2s ease,
 
-    *background* .2s ease;
+    background .2s ease;
 
 }
 
@@ -492,7 +492,7 @@
 
     box-shadow .2s ease,
 
-    *background* .2s ease;
+    background .2s ease;
 
 }
 
@@ -1010,7 +1010,7 @@
 
     box-shadow .2s ease,
 
-    *background* .2s ease;
+    background .2s ease;
 
 }
 
@@ -1416,7 +1416,7 @@
 
    NUESTRAS ROLITAS - AJUSTES CHAT ACTUALIZADO
 
-========================================== */
+\========================================== */
 
 /* Asegurar que el chat ocupe correctamente
 
@@ -1452,7 +1452,7 @@
 
    BURBUJAS SIN CORREO NI NOMBRE
 
-========================================== */
+\========================================== */
 
 .chat-bubble {
 
@@ -1546,7 +1546,7 @@
 
    BOTÓN PARA ADJUNTAR ARCHIVOS
 
-========================================== */
+\========================================== */
 
 .chat-attachment-button {
 
@@ -1612,7 +1612,7 @@
 
    ÁREA DE CONVERSACIÓN
 
-========================================== */
+\========================================== */
 
 .chat-room {
 
@@ -1714,7 +1714,7 @@
 
    FIX: CAMPO DE MENSAJE Y BORDE DESBORDADO
 
-========================================== */
+\========================================== */
 
 .chat-send-form {
 
@@ -1958,41 +1958,68 @@
 
 }
 
-
 /* Pulido visual del acceso al mensaje más reciente */
+
 .chat-jump-latest {
+
   opacity: 1;
+
   transform: translateY(0);
+
   -webkit-tap-highlight-color: transparent;
+
   touch-action: manipulation;
+
 }
 
 .chat-jump-latest:focus-visible {
+
   outline: 2px solid #c47ba6;
+
   outline-offset: 3px;
+
 }
 
 @media (hover: hover) and (pointer: fine) {
+
   .chat-jump-latest:hover {
+
     background: #9c4779;
+
     transform: translateY(-2px);
+
     box-shadow: 0 7px 18px rgba(80, 35, 65, .26);
+
   }
+
 }
 
 @media (max-width: 360px) {
+
   .chat-jump-latest {
+
     right: 9px;
+
     bottom: 68px;
+
     max-width: calc(100% - 18px);
+
     padding: 9px 11px;
+
     font-size: 10px;
+
   }
+
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .chat-jump-latest {
+
     transition: none;
+
     animation: none;
+
   }
+
 }
