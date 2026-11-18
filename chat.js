@@ -25,6 +25,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 import {
+  getStorage,
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
+
+import {
   getDatabase,
   ref as rtdbRef,
   onValue,
@@ -50,6 +57,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 const realtimeDb = getDatabase(
   app,
@@ -182,6 +190,115 @@ function setReplyTarget(message) {
 }
 
 ensureReplyComposer();
+
+/* ==========================================
+   ADJUNTAR ARCHIVOS
+========================================== */
+
+let attachmentInput = null;
+let attachmentButton = null;
+
+function ensureAttachmentPicker() {
+  if (!sendForm || attachmentInput) return;
+
+  attachmentInput = document.createElement("input");
+  attachmentInput.type = "file";
+  attachmentInput.multiple = true;
+  attachmentInput.id = "chat-attachment-input";
+  attachmentInput.hidden = true;
+  // Sin atributo accept: permite seleccionar cualquier formato.
+
+  attachmentButton = document.createElement("button");
+  attachmentButton.type = "button";
+  attachmentButton.className = "chat-attach-button";
+  attachmentButton.textContent = "＋";
+  attachmentButton.title = "Adjuntar fotos, videos o archivos";
+  attachmentButton.setAttribute("aria-label", "Adjuntar archivos");
+  attachmentButton.addEventListener("click", () => attachmentInput.click());
+
+  attachmentInput.addEventListener("change", () => {
+    const count = attachmentInput.files?.length || 0;
+    if (sendError) {
+      sendError.textContent = count
+        ? `${count} archivo(s) seleccionado(s). Pulsa enviar para compartirlos.`
+        : "";
+    }
+  });
+
+  const style = document.createElement("style");
+  style.textContent = `
+    .chat-attach-button{width:40px;height:40px;flex:0 0 40px;border:0;border-radius:50%;background:#f6e5ef;color:#a94f85;font-size:27px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+    .chat-attach-button:disabled{opacity:.5;cursor:wait}
+    .chat-attachment{display:flex;flex-direction:column;gap:6px;margin:2px 0 8px;max-width:min(100%,280px)}
+    .chat-attachment img,.chat-attachment video{display:block;max-width:100%;max-height:300px;border-radius:10px;object-fit:contain;background:#f3edf1}
+    .chat-attachment-file{display:flex;align-items:center;gap:8px;padding:9px 11px;border:1px solid rgba(150,100,130,.2);border-radius:10px;background:rgba(255,255,255,.55);overflow-wrap:anywhere}
+    .chat-attachment-file a{color:#9d477b;font-size:12px;text-decoration:underline}
+    .chat-attachment-name{font-size:11px;opacity:.8}
+  `;
+  document.head.appendChild(style);
+
+  const inputAnchor = messageInput || sendButton;
+  if (inputAnchor && inputAnchor.parentNode === sendForm) {
+    sendForm.insertBefore(attachmentButton, inputAnchor);
+    sendForm.insertBefore(attachmentInput, attachmentButton.nextSibling);
+  } else {
+    sendForm.append(attachmentButton, attachmentInput);
+  }
+}
+
+ensureAttachmentPicker();
+
+function formatFileSize(bytes) {
+  if (!Number.isFinite(bytes) || bytes < 0) return "";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+function createAttachmentElement(attachment) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "chat-attachment";
+
+  const url = attachment?.url || "";
+  const type = attachment?.contentType || "";
+  const name = attachment?.name || "Archivo adjunto";
+
+  if (url && type.startsWith("image/")) {
+    const link = document.createElement("a");
+    link.href = url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    const image = document.createElement("img");
+    image.src = url;
+    image.alt = name;
+    image.loading = "lazy";
+    link.appendChild(image);
+    wrapper.appendChild(link);
+  } else if (url && type.startsWith("video/")) {
+    const video = document.createElement("video");
+    video.src = url;
+    video.controls = true;
+    video.preload = "metadata";
+    video.playsInline = true;
+    wrapper.appendChild(video);
+  } else {
+    const fileRow = document.createElement("div");
+    fileRow.className = "chat-attachment-file";
+    const link = document.createElement("a");
+    link.href = url || "#";
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = `📎 ${name}`;
+    if (!url) link.removeAttribute("href");
+    const details = document.createElement("span");
+    details.className = "chat-attachment-name";
+    details.textContent = formatFileSize(Number(attachment?.size || 0));
+    fileRow.append(link, details);
+    wrapper.appendChild(fileRow);
+  }
+
+  return wrapper;
+}
 
 /* ==========================================
    4. ESTADO DEL CHAT
@@ -817,9 +934,14 @@ function renderMessages(docs, { initial = false } = {}) {
       bubble.appendChild(quote);
     }
 
+    if (data.attachment && typeof data.attachment === "object") {
+      bubble.appendChild(createAttachmentElement(data.attachment));
+    }
+
     const body = document.createElement("p");
     body.className = "chat-bubble-text";
     body.textContent = data.text || "";
+    if (!data.text) body.hidden = true;
 
     const meta = document.createElement("div");
     meta.className = "chat-bubble-meta";
@@ -1195,42 +1317,86 @@ sendForm?.addEventListener("submit", async (event) => {
   if (!currentUser) return;
 
   const text = messageInput?.value.trim() || "";
+  const selectedFiles = Array.from(attachmentInput?.files || []);
 
-  if (!text) return;
+  if (!text && selectedFiles.length === 0) return;
 
-  if (sendButton) {
-    sendButton.disabled = true;
-  }
-
-  if (sendError) {
-    sendError.textContent = "";
-  }
+  if (sendButton) sendButton.disabled = true;
+  if (attachmentButton) attachmentButton.disabled = true;
+  if (sendError) sendError.textContent = "";
 
   try {
-    await addDoc(messagesRef, {
-      text: text,
-      senderUid: currentUser.uid,
-      senderName: "Usuario",
-      createdAt: serverTimestamp(),
-      ...(replyingTo ? { replyTo: { ...replyingTo } } : {})
-    });
+    if (selectedFiles.length === 0) {
+      await addDoc(messagesRef, {
+        text,
+        senderUid: currentUser.uid,
+        senderName: "Usuario",
+        createdAt: serverTimestamp(),
+        ...(replyingTo ? { replyTo: { ...replyingTo } } : {})
+      });
+    } else {
+      for (let index = 0; index < selectedFiles.length; index++) {
+        const file = selectedFiles[index];
+        const safeName = file.name.replace(/[\\\\/]/g, "_");
+        const uniqueName = `${Date.now()}_${crypto.randomUUID()}_${safeName}`;
+        const path = `chat-media/${currentUser.uid}/${uniqueName}`;
+        const fileRef = storageRef(storage, path);
 
-    messageInput.value = "";
+        if (sendError) {
+          sendError.textContent = `Subiendo ${index + 1} de ${selectedFiles.length}: ${file.name}`;
+        }
+
+        const metadata = {
+          contentType: file.type || "application/octet-stream",
+          customMetadata: {
+            originalName: file.name,
+            ownerUid: currentUser.uid
+          }
+        };
+
+        await uploadBytes(fileRef, file, metadata);
+        const downloadURL = await getDownloadURL(fileRef);
+
+        await addDoc(messagesRef, {
+          text: index === 0 ? text : "",
+          senderUid: currentUser.uid,
+          senderName: "Usuario",
+          createdAt: serverTimestamp(),
+          attachment: {
+            name: file.name,
+            contentType: file.type || "application/octet-stream",
+            size: file.size,
+            url: downloadURL,
+            storagePath: path
+          },
+          ...(index === 0 && replyingTo ? { replyTo: { ...replyingTo } } : {})
+        });
+      }
+    }
+
+    if (messageInput) messageInput.value = "";
+    if (attachmentInput) attachmentInput.value = "";
     clearReplyTarget();
-    messageInput.focus();
+    if (sendError) sendError.textContent = "";
+    messageInput?.focus();
 
   } catch (error) {
-    console.error("Error enviando mensajes:", error);
+    console.error("Error enviando mensaje o archivo:", error);
 
     if (sendError) {
+      const messages = {
+        "storage/unauthorized": "Storage rechazó la subida. Revisa sus reglas.",
+        "storage/canceled": "La subida fue cancelada.",
+        "storage/unknown": "Storage tuvo un error al subir el archivo."
+      };
       sendError.textContent =
-        "No se pudo enviar. Comprueba los permisos de Firestore.";
+        messages[error.code] ||
+        `No se pudo enviar. ${error.message || "Revisa las reglas de Firebase."}`;
     }
 
   } finally {
-    if (sendButton) {
-      sendButton.disabled = false;
-    }
+    if (sendButton) sendButton.disabled = false;
+    if (attachmentButton) attachmentButton.disabled = false;
   }
 });
 
