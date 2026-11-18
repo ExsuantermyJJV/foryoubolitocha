@@ -3656,3 +3656,58 @@ body[data-theme="light"] .notification-message-content p {
     font-size: .9rem;
   }
 }
+
+/* ==========================================
+   CHAT MÁS AMPLIO - NUESTRAS ROLITAS
+   ========================================== */
+
+/* Aprovechar mejor el ancho de la pantalla */
+.app-view:has(#firebase-chat) {
+  padding: 10px 7px 28px;
+  overflow: hidden;
+}
+
+/* Mantener el encabezado alineado */
+.app-view:has(#firebase-chat) .app-header {
+  margin: 0 6px 10px;
+  flex-shrink: 0;
+}
+
+/* Ampliar el contenedor del chat */
+.app-view:has(#firebase-chat) .firebase-chat {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  min-height: 0;
+  padding: 10px;
+  border-radius: 19px;
+}
+
+/* Dar más espacio a la conversación */
+.app-view:has(#firebase-chat) .chat-messages {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 12px 5px;
+}
+
+/* Burbujas ligeramente más amplias */
+.app-view:has(#firebase-chat) .chat-bubble {
+  max-width: 91%;
+}
+
+/* Mantener el campo de escritura visible */
+.app-view:has(#firebase-chat) .chat-send-form {
+  flex: 0 0 auto;
+  padding-top: 10px;
+}
+
+/* Ajuste para móviles pequeños */
+@media (max-width: 370px) {
+  .app-view:has(#firebase-chat) {
+    padding-inline: 5px;
+  }
+
+  .app-view:has(#firebase-chat) .firebase-chat {
+    padding: 8px;
+  }
+}

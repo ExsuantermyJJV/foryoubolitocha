@@ -1,25 +1,11 @@
-
 "use strict";
 
 /* =====================================================
    NUESTRAS ROLITAS
    Sistema central del iPhone virtual
-
-   - Navegación entre aplicaciones
-   - Gestos táctiles y de ratón
-   - Centro de notificaciones
-   - Reproductor sincronizado
-   - Dynamic Island minimalista
-   - Personalización
-   - Reloj y fecha
-   - Contador de mensajes
-   - Atajos de teclado
 ===================================================== */
 
-
-/* =====================================================
-   1. UTILIDADES
-===================================================== */
+/* 1. UTILIDADES */
 
 const $ = (selector, parent = document) =>
   parent.querySelector(selector);
@@ -50,9 +36,7 @@ const formatTime = seconds => {
 };
 
 
-/* =====================================================
-   2. ELEMENTOS PRINCIPALES
-===================================================== */
+/* 2. ELEMENTOS PRINCIPALES */
 
 const phone = $("#phone-device");
 const phoneScreen = $("#phone-screen");
@@ -87,13 +71,10 @@ const notificationClear = $("#clear-notifications");
 
 let currentApp = "home";
 let appHistory = [];
-
 let notificationOpen = false;
 
 
-/* =====================================================
-   3. RELOJ DEL TELÉFONO
-===================================================== */
+/* 3. RELOJ DEL TELÉFONO */
 
 const clockFormatter = new Intl.DateTimeFormat("es-CO", {
   hour: "numeric",
@@ -151,29 +132,48 @@ document.addEventListener("visibilitychange", () => {
 });
 
 
-/* =====================================================
-   4. NAVEGACIÓN ENTRE APLICACIONES
-===================================================== */
+/* 4. NAVEGACIÓN ENTRE APLICACIONES */
 
 function getScreen(appName) {
   return $(`[data-app-screen="${appName}"]`);
 }
+
+// Guarda la posición de desplazamiento de cada aplicación.
+// Así, al salir y volver a entrar, conserva dónde estaba el usuario.
+const appScrollPositions = new Map();
 
 function showScreen(appName) {
   const target = getScreen(appName);
 
   if (!target) return false;
 
+  // Guardar la posición de la aplicación que se está cerrando.
+  const currentScreen = getScreen(currentApp);
+
+  if (currentScreen && currentScreen !== target) {
+    appScrollPositions.set(currentApp, currentScreen.scrollTop);
+  }
+
+  // Mostrar únicamente la aplicación solicitada.
   appScreens.forEach(screen => {
     screen.hidden = screen !== target;
   });
 
   currentApp = appName;
-
   document.body.dataset.currentApp = appName;
 
-  target.scrollTop = 0;
+  // Restaurar la posición anterior. Si nunca se abrió, empieza arriba.
+  const savedScrollTop = appScrollPositions.get(appName) ?? 0;
 
+  requestAnimationFrame(() => {
+    // Evitar modificar una pantalla si el usuario ya cambió de aplicación.
+    if (currentApp === appName && !target.hidden) {
+      target.scrollTop = savedScrollTop;
+    }
+  });
+
+  // Al entrar en Mensajes se marca como leído, conservando el contador
+  // y la lógica que gestiona el resto del sistema.
   if (appName === "messages") {
     window.markMessagesAsRead?.();
   }
@@ -246,9 +246,7 @@ homeIndicator?.addEventListener("keydown", event => {
 });
 
 
-/* =====================================================
-   5. CENTRO DE NOTIFICACIONES
-===================================================== */
+/* 5. CENTRO DE NOTIFICACIONES */
 
 function updateNotificationMusic() {
   const track = musicList[trackIndex];
@@ -289,7 +287,6 @@ function openNotifications() {
   updateNotificationMusic();
 
   notificationCenter.hidden = false;
-
   notificationCenter.setAttribute("aria-hidden", "false");
 
   requestAnimationFrame(() => {
@@ -301,9 +298,7 @@ function closeNotifications() {
   if (!notificationCenter || !notificationOpen) return;
 
   notificationOpen = false;
-
   notificationCenter.classList.remove("is-open");
-
   notificationCenter.setAttribute("aria-hidden", "true");
 
   setTimeout(() => {
@@ -331,9 +326,7 @@ notificationClear?.addEventListener("click", () => {
 });
 
 
-/* =====================================================
-   6. GESTOS UNIFICADOS: MÓVIL Y PC
-===================================================== */
+/* 6. GESTOS UNIFICADOS: MÓVIL Y PC */
 
 const gesture = {
   active: false,
@@ -361,30 +354,21 @@ function getGestureZone(x, y, bounds) {
   const localY = y - bounds.top;
   const localX = x - bounds.left;
 
-  if (notificationOpen) {
-    return "notification";
-  }
-
-  if (localY <= GESTURE_CONFIG.topZone) {
-    return "top";
-  }
+  if (notificationOpen) return "notification";
+  if (localY <= GESTURE_CONFIG.topZone) return "top";
 
   if (localY >= bounds.height - GESTURE_CONFIG.bottomZone) {
     return "bottom";
   }
 
-  if (localX <= GESTURE_CONFIG.leftZone) {
-    return "left";
-  }
+  if (localX <= GESTURE_CONFIG.leftZone) return "left";
 
   return "none";
 }
 
 function startGesture(event) {
   if (!phoneScreen || gesture.active) return;
-
   if (event.pointerType === "mouse" && event.button !== 0) return;
-
   if (isTyping(event.target)) return;
 
   const targetElement = event.target instanceof Element
@@ -405,13 +389,10 @@ function startGesture(event) {
 
   gesture.active = true;
   gesture.pointerId = event.pointerId;
-
   gesture.startX = event.clientX;
   gesture.startY = event.clientY;
-
   gesture.lastX = event.clientX;
   gesture.lastY = event.clientY;
-
   gesture.startTime = Date.now();
 
   gesture.zone = getGestureZone(
@@ -421,16 +402,10 @@ function startGesture(event) {
   );
 
   gesture.moved = false;
-
-  // IMPORTANTE:
-  // No usar setPointerCapture en phoneScreen.
-  // Capturar el puntero en toda la pantalla bloqueaba los clics
-  // de los botones y controles internos.
 }
 
 function moveGesture(event) {
   if (!gesture.active) return;
-
   if (event.pointerId !== gesture.pointerId) return;
 
   const deltaX = event.clientX - gesture.startX;
@@ -460,14 +435,11 @@ function moveGesture(event) {
 
 function endGesture(event) {
   if (!gesture.active) return;
-
   if (event.pointerId !== gesture.pointerId) return;
 
   const deltaX = event.clientX - gesture.startX;
   const deltaY = event.clientY - gesture.startY;
-
   const zone = gesture.zone;
-
   const elapsed = Date.now() - gesture.startTime;
 
   gesture.active = false;
@@ -508,7 +480,6 @@ function endGesture(event) {
     return;
   }
 
-  // Deslizamiento rápido desde el borde izquierdo.
   if (
     zone === "left" &&
     deltaX > GESTURE_CONFIG.backDistance &&
@@ -524,9 +495,6 @@ function cancelGesture() {
 }
 
 if (phoneScreen) {
-  // El inicio se detecta dentro del teléfono.
-  // El seguimiento se hace en window para no bloquear los botones.
-
   phoneScreen.addEventListener("pointerdown", startGesture, {
     passive: true
   });
@@ -543,16 +511,10 @@ if (phoneScreen) {
 }
 
 
-/* =====================================================
-   7. APERTURA CON CLIC EN PC
-===================================================== */
-
-// La zona superior abre las notificaciones con clic.
-// Se excluyen botones y controles para evitar conflictos.
+/* 7. APERTURA CON CLIC EN PC */
 
 phoneScreen?.addEventListener("click", event => {
   if (notificationOpen) return;
-
   if (isTyping(event.target)) return;
 
   const targetElement = event.target instanceof Element
@@ -577,7 +539,6 @@ phoneScreen?.addEventListener("click", event => {
   }
 });
 
-// Dynamic Island: clic para abrir notificaciones.
 $("#dynamic-island")?.addEventListener("click", () => {
   if (notificationOpen) {
     closeNotifications();
@@ -587,9 +548,7 @@ $("#dynamic-island")?.addEventListener("click", () => {
 });
 
 
-/* =====================================================
-   8. TECLADO Y NAVEGACIÓN EN PC
-===================================================== */
+/* 8. TECLADO Y NAVEGACIÓN EN PC */
 
 document.addEventListener("keydown", event => {
   if (isTyping(event.target)) return;
@@ -616,12 +575,95 @@ document.addEventListener("keydown", event => {
   }
 });
 
-
-/* =====================================================
-   9. MENSAJES NO LEÍDOS
-===================================================== */
+/* 9. MENSAJES NO LEÍDOS */
 
 const unreadBadge = $("#chat-unread-badge");
+
+// Estilo de la insignia: se coloca encima del icono.
+(function installUnreadBadgeStyles() {
+  if (document.getElementById("rolitas-unread-badge-styles")) return;
+
+  const style = document.createElement("style");
+  style.id = "rolitas-unread-badge-styles";
+
+  style.textContent = `
+    .app-icon {
+      overflow: visible !important;
+    }
+
+    .app-icon-image {
+      position: relative !important;
+      overflow: visible !important;
+      isolation: isolate;
+    }
+
+    #chat-unread-badge.app-notification-badge {
+      position: absolute !important;
+      top: -7px !important;
+      right: -8px !important;
+      bottom: auto !important;
+      left: auto !important;
+      z-index: 20 !important;
+
+      display: grid;
+      place-items: center;
+      min-width: 22px;
+      width: max-content;
+      height: 22px;
+      padding: 0 6px;
+      box-sizing: border-box;
+
+      border: 2px solid rgba(255, 255, 255, .96);
+      border-radius: 999px;
+      background: linear-gradient(145deg, #ff526b, #ed1745);
+      color: #fff;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -.2px;
+      text-align: center;
+      white-space: nowrap;
+
+      box-shadow:
+        0 2px 5px rgba(0, 0, 0, .28),
+        0 0 0 1px rgba(237, 23, 69, .12);
+
+      pointer-events: none;
+      transform: translateZ(0);
+      animation: rolitasBadgePop .22s cubic-bezier(.2, .8, .2, 1);
+    }
+
+    #chat-unread-badge[hidden] {
+      display: none !important;
+    }
+
+    @keyframes rolitasBadgePop {
+      0% {
+        opacity: 0;
+        scale: .55;
+      }
+
+      75% {
+        opacity: 1;
+        scale: 1.12;
+      }
+
+      100% {
+        opacity: 1;
+        scale: 1;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #chat-unread-badge.app-notification-badge {
+        animation: none;
+      }
+    }
+  `;
+
+  document.head.appendChild(style);
+})();
 
 const UNREAD_STORAGE_KEY = "rolitas_unread_messages";
 
@@ -630,7 +672,7 @@ let unreadCount = Number(
 );
 
 function updateUnreadBadge(count) {
-  unreadCount = Math.max(0, Number(count) || 0);
+  unreadCount = Math.max(0, Math.floor(Number(count) || 0));
 
   if (unreadBadge) {
     unreadBadge.textContent = unreadCount > 99
@@ -638,12 +680,23 @@ function updateUnreadBadge(count) {
       : String(unreadCount);
 
     unreadBadge.hidden = unreadCount === 0;
+
+    unreadBadge.setAttribute(
+      "aria-label",
+      unreadCount === 1
+        ? "1 mensaje sin leer"
+        : `${unreadCount} mensajes sin leer`
+    );
   }
 
-  localStorage.setItem(
-    UNREAD_STORAGE_KEY,
-    String(unreadCount)
-  );
+  try {
+    localStorage.setItem(
+      UNREAD_STORAGE_KEY,
+      String(unreadCount)
+    );
+  } catch (error) {
+    console.warn("No se pudo guardar el contador de mensajes.", error);
+  }
 
   window.dispatchEvent(
     new CustomEvent("rolitas:unread-count", {
@@ -667,9 +720,7 @@ window.addEventListener("storage", event => {
 updateUnreadBadge(unreadCount);
 
 
-/* =====================================================
-   10. NOTIFICACIONES DE MENSAJES
-===================================================== */
+/* 10. NOTIFICACIONES DE MENSAJES */
 
 function addMessageNotification(message, sender = "Mensajes") {
   if (!notificationList) return;
@@ -739,16 +790,14 @@ window.addEventListener("rolitas:incoming-message", event => {
     detail.sender || "Mensajes"
   );
 
-  // No mostrar notificación si el usuario ya está dentro del chat.
+  // No mostrar contador si el usuario ya está dentro del chat.
   if (currentApp !== "messages") {
     updateUnreadBadge(unreadCount + 1);
   }
 });
 
 
-/* =====================================================
-   11. PERSONALIZACIÓN DEL TELÉFONO
-===================================================== */
+/* 11. PERSONALIZACIÓN DEL TELÉFONO */
 
 const wallpaperUpload = $("#wallpaper-upload");
 const wallpaperElement = $("#phone-wallpaper");
@@ -855,7 +904,6 @@ wallpaperUpload?.addEventListener("change", event => {
 
     image.onload = () => {
       const canvas = document.createElement("canvas");
-
       const maxDimension = 1400;
 
       const scale = Math.min(
@@ -930,10 +978,7 @@ resetCustomizationButton?.addEventListener("click", () => {
 
 loadCustomization();
 
-
-/* =====================================================
-   12. REPRODUCTOR DE MÚSICA
-===================================================== */
+/* 12. REPRODUCTOR DE MÚSICA */
 
 const nowPlaying = $(".now-playing");
 const trackArt = $(".track-art");
@@ -1022,9 +1067,7 @@ const musicList = [
 ];
 
 
-/* =====================================================
-   13. AUDIO Y VOLUMEN
-===================================================== */
+/* 13. AUDIO Y VOLUMEN */
 
 function prepareAudioBoost() {
   if (gainNode) return;
@@ -1071,9 +1114,7 @@ function setVolume() {
 volumeSlider?.addEventListener("input", setVolume);
 
 
-/* =====================================================
-   14. TEMAS DINÁMICOS
-===================================================== */
+/* 14. TEMAS DINÁMICOS */
 
 function applyTrackTheme(track) {
   if (!track) return;
@@ -1108,9 +1149,7 @@ function applyTrackTheme(track) {
 }
 
 
-/* =====================================================
-   15. INTERFAZ DEL REPRODUCTOR
-===================================================== */
+/* 15. INTERFAZ DEL REPRODUCTOR */
 
 function updatePlayButton() {
   if (playPauseButton) {
@@ -1175,9 +1214,7 @@ function seekTo() {
 }
 
 
-/* =====================================================
-   16. CARGAR CANCIONES
-===================================================== */
+/* 16. CARGAR CANCIONES */
 
 function loadTrack(index) {
   if (!musicList.length) return;
@@ -1224,9 +1261,7 @@ function loadTrack(index) {
 }
 
 
-/* =====================================================
-   17. REPRODUCIR / PAUSAR
-===================================================== */
+/* 17. REPRODUCIR / PAUSAR */
 
 async function playTrack() {
   try {
@@ -1271,9 +1306,7 @@ function playPauseTrack() {
 }
 
 
-/* =====================================================
-   18. SIGUIENTE / ANTERIOR / ALEATORIO
-===================================================== */
+/* 18. SIGUIENTE / ANTERIOR / ALEATORIO */
 
 function getNextRandomIndex() {
   if (musicList.length < 2) return trackIndex;
@@ -1320,10 +1353,7 @@ function toggleRepeat() {
   updateModeButtons();
 }
 
-
-/* =====================================================
-   19. EVENTOS DEL REPRODUCTOR
-===================================================== */
+/* 19. EVENTOS DEL REPRODUCTOR */
 
 playPauseButton?.addEventListener("click", playPauseTrack);
 
@@ -1381,9 +1411,7 @@ currentTrack.addEventListener("error", () => {
 });
 
 
-/* =====================================================
-   20. CONTROLES DE MÚSICA EN NOTIFICACIONES
-===================================================== */
+/* 20. CONTROLES DE MÚSICA EN NOTIFICACIONES */
 
 notificationPlay?.addEventListener("click", playPauseTrack);
 
@@ -1392,9 +1420,7 @@ notificationNext?.addEventListener("click", nextTrack);
 notificationPrev?.addEventListener("click", previousTrack);
 
 
-/* =====================================================
-   21. CARTA SORPRESA
-===================================================== */
+/* 21. CARTA SORPRESA */
 
 function initLetter() {
   const toggle = $(".letter-toggle");
@@ -1416,9 +1442,7 @@ function initLetter() {
 }
 
 
-/* =====================================================
-   22. SINCRONIZACIÓN ENTRE PESTAÑAS
-===================================================== */
+/* 22. SINCRONIZACIÓN ENTRE PESTAÑAS */
 
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden) {
@@ -1429,9 +1453,7 @@ document.addEventListener("visibilitychange", () => {
 });
 
 
-/* =====================================================
-   23. INICIALIZACIÓN
-===================================================== */
+/* 23. INICIALIZACIÓN */
 
 function initializePhone() {
   showScreen("home");

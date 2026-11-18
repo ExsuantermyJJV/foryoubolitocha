@@ -1174,3 +1174,82 @@
   outline: 2px solid #c47ba6;
   outline-offset: 3px;
 }
+
+/* ==========================================
+   FIX: CAMPO DE MENSAJE Y BORDE DESBORDADO
+========================================== */
+
+.chat-send-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+
+  padding: 9px 0 0;
+  margin: 0;
+
+  overflow: visible;
+}
+
+.chat-send-form input {
+  display: block;
+
+  flex: 1 1 0%;
+  width: 0;
+  min-width: 0;
+  max-width: 100%;
+
+  height: 42px;
+  margin: 0;
+  padding: 0 14px;
+
+  box-sizing: border-box;
+  border: 1px solid #ead8e4;
+  border-radius: 999px;
+
+  background: #fff;
+  color: #352638;
+
+  outline: none;
+  box-shadow: none;
+
+  font: 12px "DM Sans", sans-serif;
+}
+
+.chat-send-form input:focus {
+  border-color: #c47ba6;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(196, 123, 166, 0.12);
+}
+
+.chat-send-form button {
+  display: grid;
+  place-items: center;
+
+  flex: 0 0 40px;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+
+  margin: 0;
+  padding: 0;
+
+  box-sizing: border-box;
+  border: none;
+  border-radius: 50%;
+
+  background: #a44d80;
+  color: #fff;
+}
+
+.chat-send-form button i {
+  pointer-events: none;
+}
+
+.chat-send-form button:focus-visible {
+  outline: 2px solid #c47ba6;
+  outline-offset: 3px;
+}
