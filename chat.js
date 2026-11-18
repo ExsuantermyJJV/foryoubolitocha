@@ -1300,31 +1300,45 @@ function startPresenceTracking(user) {
 
   );
 
-  const allPresenceRef = rtdbRef(
+  // Este chat solo tiene dos cuentas autorizadas. Consultar directamente
 
-    realtimeDb,
+  // el UID contrario evita confundir registros antiguos de otras cuentas.
 
-    PRESENCE_PATH
+  const otherUserUid = Object.keys(CHAT_ALLOWED_USERS).find(
+
+    (uid) => uid !== user.uid
 
   );
 
-  // Escuchar el estado de la otra cuenta.
+  if (!otherUserUid) {
+
+    peerPresence = null;
+
+    renderPeerPresence();
+
+    console.error("No se encontró el UID autorizado de la otra persona.");
+
+    return;
+
+  }
+
+  const otherStatusRef = rtdbRef(
+
+    realtimeDb,
+
+    `${PRESENCE_PATH}/${otherUserUid}`
+
+  );
+
+  // Escuchar exclusivamente la presencia de la otra cuenta autorizada.
 
   stopPresenceListener = onValue(
 
-    allPresenceRef,
+    otherStatusRef,
 
     (snapshot) => {
 
-      const allUsers = snapshot.val() || {};
-
-      const otherEntry = Object.entries(allUsers).find(
-
-        ([uid]) => uid !== user.uid
-
-      );
-
-      peerPresence = otherEntry ? otherEntry[1] : null;
+      peerPresence = snapshot.val() || null;
 
       renderPeerPresence();
 
@@ -2470,7 +2484,7 @@ async function loadOlderMessages() {
 
     }
 
-    hasMoreOlderMessages = pageDocs.length === 50;
+    hasMoreOlderMessages = pageDocs.length === 30;
 
     const combined = combineLoadedMessages();
 
@@ -2662,7 +2676,7 @@ function startMessagesListener(user) {
 
         oldestLoadedMessageDoc = snapshot.docs[snapshot.docs.length - 1] || null;
 
-        hasMoreOlderMessages = snapshot.docs.length === 100;
+        hasMoreOlderMessages = snapshot.docs.length === 30;
 
       }
 
