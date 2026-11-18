@@ -1646,6 +1646,19 @@ function isChatScreenVisible() {
 
 }
 
+// Guardar la posición mientras el chat todavía está visible.
+function saveChatScrollPosition() {
+
+  if (!messagesBox || !isChatScreenVisible()) return;
+
+  savedChatScrollTop = messagesBox.scrollTop;
+
+}
+
+// API usada por el navegador interno desde main.js antes de ocultar Mensajes.
+window.saveChatScrollPosition = saveChatScrollPosition;
+window.restoreChatScrollPosition = restoreChatScrollPosition;
+
 function restoreChatScrollPosition() {
 
   if (!messagesBox || !isChatScreenVisible()) return;
@@ -1682,6 +1695,7 @@ function restoreChatScrollPosition() {
 
       }
 
+      userScrollIntentSinceRestore = false;
       scrollChatTo(savedChatScrollTop);
 
     });
@@ -1700,11 +1714,9 @@ if (messagesScreen && typeof MutationObserver !== "undefined") {
 
       restoreChatScrollPosition();
 
-    } else if (messagesBox) {
-
-      savedChatScrollTop = messagesBox.scrollTop;
-
     }
+    // No leer scrollTop después de ocultar la pantalla: algunos navegadores
+    // lo convierten temporalmente en cero y eso manda el chat al historial antiguo.
 
   });
 
@@ -2512,11 +2524,14 @@ async function loadOlderMessages() {
 
 ensureJumpToLatestButton();
 
+let userScrollIntentSinceRestore = false;
+
 function registerUserChatScrollIntent() {
 
   if (!isChatScreenVisible()) return;
 
   hasUserScrolledChat = true;
+  userScrollIntentSinceRestore = true;
 
   savedChatScrollTop = messagesBox.scrollTop;
 
@@ -2560,7 +2575,15 @@ messagesBox?.addEventListener("scroll", () => {
 
   });
 
-  if (messagesBox.scrollTop < 70) loadOlderMessages();
+  // La restauración programática de scroll no debe consultar páginas antiguas.
+  if (
+    userScrollIntentSinceRestore &&
+    isChatScreenVisible() &&
+    messagesBox.scrollTop < 70
+  ) {
+    userScrollIntentSinceRestore = false;
+    loadOlderMessages();
+  }
 
 }, { passive: true });
 
@@ -3245,6 +3268,9 @@ async function startAuthSession() {
   latestLiveMessagesDocs = [];
 
   savedChatScrollTop = null;
+
+  hasUserScrolledChat = false;
+  userScrollIntentSinceRestore = false;
 
   pendingInitialScroll = true;
 
