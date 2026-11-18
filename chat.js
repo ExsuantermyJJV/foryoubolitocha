@@ -40,6 +40,8 @@ import {
 
   updateDoc,
 
+  deleteField,
+
   query,
 
   orderBy,
@@ -315,7 +317,16 @@ function ensureReplyComposer() {
     .chat-bubble--mine .chat-reply-quote{background:rgba(255,255,255,.55)}
 
     .chat-reply-target-highlight{outline:2px solid #c47ba6;outline-offset:3px;transition:outline .2s}
-
+    .chat-bubble{position:relative}
+    .chat-reaction-picker{position:absolute;z-index:30;left:8px;bottom:calc(100% - 3px);display:flex;align-items:center;gap:5px;padding:7px 9px;border:1px solid rgba(173,86,137,.2);border-radius:24px;background:#fff;box-shadow:0 5px 22px rgba(35,20,35,.2);white-space:nowrap}
+    .chat-reaction-picker[hidden]{display:none!important}
+    .chat-reaction-button{display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;border-radius:50%;background:transparent;font-size:22px;cursor:pointer;transition:transform .12s,background .12s}
+    .chat-reaction-button:hover{background:#f8eaf2;transform:scale(1.16)}
+    .chat-reaction-reply{width:auto;padding:0 9px;border-left:1px solid #eadce5;border-radius:0;font-size:11px;font-weight:600;color:#91416f}
+    .chat-reaction-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+    .chat-reaction-chip{display:inline-flex;align-items:center;gap:4px;min-height:23px;padding:2px 7px;border:1px solid #eadce5;border-radius:14px;background:#fff;font-size:12px;line-height:1;cursor:pointer}
+    .chat-reaction-chip.is-mine{border-color:#bd76a0;background:#fff0f7}
+    .chat-reaction-chip:disabled{opacity:.65;cursor:default}
   `;
 
   document.head.appendChild(style);
@@ -569,7 +580,59 @@ function setReplyTarget(message) {
   replyPreview.hidden = false;
 
   messageInput?.focus();
+}
 
+const CHAT_REACTIONS = ["❤️", "😂", "😡", "😭"];
+
+function closeReactionPickers(except = null) {
+  document.querySelectorAll(".chat-reaction-picker").forEach((picker) => {
+    if (picker !== except) picker.hidden = true;
+  });
+}
+
+async function toggleMessageReaction(messageId, emoji) {
+  if (!currentUser || !messageId || !CHAT_REACTIONS.includes(emoji)) return;
+  const reactionField = `reactions.${currentUser.uid}`;
+  const messageRef = doc(messagesRef, messageId);
+  try {
+    // Cada usuario conserva una sola reacción por mensaje. Elegir la misma
+    // reacción la elimina; elegir otra la reemplaza.
+    const current = lastRenderedDocs.find((entry) => entry.id === messageId)?.data()?.reactions?.[currentUser.uid];
+    await updateDoc(messageRef, {
+      [reactionField]: current === emoji ? deleteField() : emoji
+    });
+  } catch (error) {
+    console.error("No se pudo guardar la reacción:", error);
+    if (sendError) sendError.textContent = "No se pudo guardar la reacción. Inténtalo de nuevo.";
+  }
+}
+
+function createReactionList(data, messageId) {
+  const reactions = data.reactions && typeof data.reactions === "object" ? data.reactions : {};
+  const counts = new Map();
+  for (const [uid, emoji] of Object.entries(reactions)) {
+    if (!CHAT_REACTIONS.includes(emoji)) continue;
+    const entry = counts.get(emoji) || { count: 0, mine: false };
+    entry.count += 1;
+    if (uid === currentUser?.uid) entry.mine = true;
+    counts.set(emoji, entry);
+  }
+  if (!counts.size) return null;
+  const list = document.createElement("div");
+  list.className = "chat-reaction-list";
+  for (const [emoji, info] of counts) {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = `chat-reaction-chip${info.mine ? " is-mine" : ""}`;
+    chip.textContent = emoji;
+    chip.title = info.mine ? "Quitar o cambiar tu reacción" : "Reaccionar";
+    chip.addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleMessageReaction(messageId, emoji);
+    });
+    list.appendChild(chip);
+  }
+  return list;
 }
 
 ensureReplyComposer();
@@ -2188,78 +2251,93 @@ function renderMessages(docs, { initial = false } = {}) {
 
     bubble.append(body, meta);
 
-    // Responder al tocar/clicar el mensaje o mantenerlo presionado.
-
-    // Los botones internos, como la cita de otra respuesta, mantienen su acción.
-
+    // Tocar el mensaje responde. Mantenerlo presionado abre el menú de
+    // reacciones y la opción Responder, evitando que ambos gestos choquen.
     const replyMessage = () => {
-
       setReplyTarget({
-
         messageId: item.id,
-
         text: data.text || "",
-
         senderUid: data.senderUid || ""
-
       });
-
     };
 
-    let longPressTimer = null;
+    const reactionPicker = document.createElement("div");
+    reactionPicker.className = "chat-reaction-picker";
+    reactionPicker.hidden = true;
+    reactionPicker.setAttribute("role", "group");
+    reactionPicker.setAttribute("aria-label", "Reaccionar al mensaje");
 
+    for (const emoji of CHAT_REACTIONS) {
+      const reactionButton = document.createElement("button");
+      reactionButton.type = "button";
+      reactionButton.className = "chat-reaction-button";
+      reactionButton.textContent = emoji;
+      reactionButton.setAttribute("aria-label", `Reaccionar ${emoji}`);
+      reactionButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        reactionPicker.hidden = true;
+        toggleMessageReaction(item.id, emoji);
+      });
+      reactionPicker.appendChild(reactionButton);
+    }
+
+    const replyButton = document.createElement("button");
+    replyButton.type = "button";
+    replyButton.className = "chat-reaction-button chat-reaction-reply";
+    replyButton.textContent = "Responder";
+    replyButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      reactionPicker.hidden = true;
+      replyMessage();
+    });
+    reactionPicker.appendChild(replyButton);
+    bubble.appendChild(reactionPicker);
+
+    const reactionList = createReactionList(data, item.id);
+    if (reactionList) bubble.appendChild(reactionList);
+
+    let longPressTimer = null;
     let longPressTriggered = false;
+    let pointerStartX = 0;
+    let pointerStartY = 0;
 
     bubble.addEventListener("pointerdown", (event) => {
-
       if (event.target.closest("button")) return;
-
       longPressTriggered = false;
-
+      pointerStartX = event.clientX;
+      pointerStartY = event.clientY;
       clearTimeout(longPressTimer);
-
       longPressTimer = setTimeout(() => {
-
         longPressTriggered = true;
-
-        replyMessage();
-
+        closeReactionPickers(reactionPicker);
+        reactionPicker.hidden = false;
       }, 550);
-
     });
 
     const cancelLongPress = () => {
-
       clearTimeout(longPressTimer);
-
       longPressTimer = null;
-
     };
 
-    bubble.addEventListener("pointerup", cancelLongPress);
-
-    bubble.addEventListener("pointerleave", cancelLongPress);
-
-    bubble.addEventListener("pointercancel", cancelLongPress);
-
-    bubble.addEventListener("click", (event) => {
-
-      if (event.target.closest("button")) return;
-
-      if (longPressTriggered) {
-
-        longPressTriggered = false;
-
-        event.preventDefault();
-
-        return;
-
+    bubble.addEventListener("pointermove", (event) => {
+      if (Math.abs(event.clientX - pointerStartX) > 10 || Math.abs(event.clientY - pointerStartY) > 10) {
+        cancelLongPress();
       }
-
+    }, { passive: true });
+    bubble.addEventListener("pointerup", cancelLongPress);
+    bubble.addEventListener("pointerleave", cancelLongPress);
+    bubble.addEventListener("pointercancel", cancelLongPress);
+    bubble.addEventListener("click", (event) => {
+      if (event.target.closest("button")) return;
+      if (longPressTriggered) {
+        longPressTriggered = false;
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+      closeReactionPickers();
       replyMessage();
-
     });
-
     const timestamp = getTimestampMillis(data.createdAt);
 
     if (
