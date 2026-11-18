@@ -7,7 +7,7 @@
 import { getApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {
-  getFirestore, collection, doc, addDoc, updateDoc, query, where,
+  getFirestore, collection, doc, addDoc, updateDoc, getDoc, query, where,
   onSnapshot, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
@@ -15,6 +15,26 @@ const app = getApp();
 const auth = getAuth(app);
 const db = getFirestore(app);
 const gamesRef = collection(db, "games");
+const chatMessagesRef = collection(db, "chats", "rolitas-privado", "messages");
+
+async function sendGameInviteMessage(gameId, type, hint = "") {
+  if (!currentUser) throw new Error("Debes iniciar sesión para enviar una invitación.");
+  const isHangman = type === "hangman";
+  await addDoc(chatMessagesRef, {
+    text: isHangman
+      ? "🎯 Te ha enviado un desafío de ahorcado."
+      : "🎨 Te ha enviado un desafío de dibujo.",
+    senderUid: currentUser.uid,
+    senderName: "Usuario",
+    createdAt: serverTimestamp(),
+    gameInvite: {
+      gameId,
+      type,
+      title: isHangman ? "Desafío de ahorcado" : "Dibuja y adivina",
+      hint: String(hint || "").slice(0, 100)
+    }
+  });
+}
 
 let currentUser = null;
 let activeGamesTab = "all";
@@ -337,9 +357,78 @@ const styles = `
 }
 
 #rolitas-games-screen .rg-input::placeholder { color: #aa98b2 !important; }
+
+#rolitas-games-screen .rg-category-box {
+  display: grid !important;
+  gap: 8px !important;
+  padding: 13px !important;
+  border: 1px solid rgba(236,133,198,.24) !important;
+  border-radius: 16px !important;
+  background: linear-gradient(135deg,rgba(220,91,171,.13),rgba(255,255,255,.035)) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.04) !important;
+}
+#rolitas-games-screen .rg-category-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  color: #ffd4eb !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+}
+#rolitas-games-screen .rg-select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  padding-right: 38px !important;
+  border-color: rgba(235,137,197,.34) !important;
+  background-color: rgba(25,15,30,.94) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23f3a9d2' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 13px center !important;
+  box-shadow: 0 5px 16px rgba(0,0,0,.16) !important;
+}
+#rolitas-games-screen .rg-hint {
+  margin: 10px 0 !important;
+  padding: 11px 13px !important;
+  border: 1px solid rgba(245,190,102,.27) !important;
+  border-radius: 13px !important;
+  background: linear-gradient(135deg,rgba(245,190,102,.12),rgba(245,190,102,.045)) !important;
+  color: #ffe0a7 !important;
+  font-size: 11px !important;
+  line-height: 1.55 !important;
+}
+#rolitas-games-screen .rg-hint strong { color: #fff0c9 !important; }
+#rolitas-games-screen .rg-hint-btn {
+  min-height: 36px !important;
+  padding: 8px 11px !important;
+  border: 1px solid rgba(245,190,102,.3) !important;
+  border-radius: 11px !important;
+  background: rgba(245,190,102,.11) !important;
+  color: #ffe0a7 !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+}
+
 #rolitas-games-screen .rg-input:focus { border-color: #e879bd !important; box-shadow: 0 0 0 3px rgba(232,121,189,.13) !important; }
+/* Opciones de categoría legibles antes y después de seleccionarlas.
+   Algunos navegadores heredaban texto oscuro sobre el menú oscuro. */
 #rolitas-games-screen .rg-input option,
-#rolitas-games-screen .rg-select option { color: #24152d !important; }
+#rolitas-games-screen .rg-select option {
+  color: #fff7fc !important;
+  background: #281b2d !important;
+}
+#rolitas-games-screen .rg-select {
+  color: #fff7fc !important;
+  -webkit-text-fill-color: #fff7fc !important;
+  background-color: #211626 !important;
+}
+#rolitas-games-screen .rg-select:focus {
+  border-color: #e879bd !important;
+  box-shadow: 0 0 0 3px rgba(232,121,189,.15) !important;
+}
+#rolitas-games-screen .rg-select option:checked {
+  color: #fff !important;
+  background: #a94f91 !important;
+}
 
 #rolitas-games-screen .rg-canvas-wrap {
   width: 100% !important;
@@ -429,6 +518,30 @@ const styles = `
 }
 
 #rolitas-games-screen .rg-key:disabled { opacity: .28 !important; }
+#rolitas-games-screen .rg-hangman-result {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  text-align: center !important;
+}
+#rolitas-games-screen .rg-hangman-result strong {
+  display: block !important;
+  min-width: 0 !important;
+  overflow-wrap: anywhere !important;
+  line-height: 1.45 !important;
+}
+#rolitas-games-screen .rg-hangman-result .rg-btn {
+  align-self: center !important;
+  min-width: 125px !important;
+}
+#rolitas-games-screen .rg-guess.rg-word-found {
+  border: 1px solid rgba(65,205,139,.55) !important;
+  background: rgba(35,155,100,.2) !important;
+  color: #a9f2cb !important;
+}
+
 
 #rolitas-games-screen .rg-guess-list {
   display: flex !important;
@@ -546,12 +659,22 @@ if (!appGrid || !phoneScreen) {
       <div class="rg-card">
         <div class="rg-row"><h4>🎯 Ahorcado</h4><span class="rg-tag">POR TURNOS</span></div>
         <p class="rg-muted">Elige una palabra y una pista. La otra persona intenta descubrirla letra por letra.</p>
-        <button class="rg-btn" id="rg-new-hangman">Crear desafío</button>
+        <div class="rg-actions">
+          <button class="rg-btn" id="rg-new-hangman">Crear desafío online</button>
+          <button class="rg-btn secondary" id="rg-solo-hangman">Jugar individual</button>
+        </div>
       </div>
       <div class="rg-card">
         <div class="rg-row"><h4>🎨 Dibuja y adivina</h4><span class="rg-tag">POR TURNOS</span></div>
         <p class="rg-muted">Dibuja una palabra secreta y envía el reto. La otra persona tendrá que adivinar.</p>
-        <button class="rg-btn" id="rg-new-draw">Crear dibujo</button>
+        <div class="rg-actions">
+          <button class="rg-btn" id="rg-new-draw">Crear desafío online</button>
+        </div>
+      </div>
+      <div class="rg-card">
+        <div class="rg-row"><h4>🔎 Sopa de letras</h4><span class="rg-tag">8 DIRECCIONES</span></div>
+        <p class="rg-muted">Encuentra palabras horizontales, verticales y diagonales, incluso al revés.</p>
+        <button class="rg-btn" id="rg-solo-wordsearch">Jugar individual</button>
       </div>
       <h4 style="font-size:13px;margin:18px 0 8px">Desafíos disponibles</h4>
       <div id="rg-open-list" class="rg-list"><div class="rg-empty">Cargando desafíos...</div></div>
@@ -617,7 +740,9 @@ function gameDate(timestamp) {
   return new Intl.DateTimeFormat("es-CO",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}).format(date);
 }
 function gameTitle(game) {
-  return game.type === "hangman" ? "🎯 Ahorcado" : "🎨 Dibuja y adivina";
+  if (game.type === "hangman") return "🎯 Ahorcado";
+  if (game.type === "wordsearch") return "🔎 Sopa de letras";
+  return "🎨 Dibuja y adivina";
 }
 function renderGameLists() {
   const openList = $("rg-open-list");
@@ -840,7 +965,8 @@ async function createHangman() {
       guessedLetters:[], mistakes:0, maxMistakes:6, winnerUid:null,
       createdAt:serverTimestamp(), updatedAt:serverTimestamp()
     });
-    showMessage("¡Desafío de ahorcado creado! La otra persona ya puede aceptarlo.");
+    await sendGameInviteMessage(ref.id, "hangman", hint);
+    showMessage("¡Desafío enviado al chat! La otra persona puede tocar «Jugar ahora».");
     showHomePanel();
   } catch (err) {
     console.error(err); showMessage("No se pudo crear el desafío. Revisa las reglas de Firestore.");
@@ -934,14 +1060,15 @@ function renderCreateDraw() {
     if (pointCount<5) return showMessage("Haz un dibujo antes de enviarlo.");
     if (pointCount>3500) return showMessage("El dibujo tiene demasiados trazos. Simplifícalo un poco.");
     try {
-      await addDoc(gamesRef,{
+      const ref = await addDoc(gamesRef,{
         type:"draw",creatorUid:currentUser.uid,players:[currentUser.uid],
         opponentUid:null,status:"open",word:word.toLocaleUpperCase("es-CO"),
         hint:$("rg-draw-hint").value.trim().slice(0,100),
         strokes:currentCanvasStrokes,guesses:[],winnerUid:null,
         createdAt:serverTimestamp(),updatedAt:serverTimestamp()
       });
-      showMessage("¡Dibujo enviado! La otra persona ya puede adivinar.");
+      await sendGameInviteMessage(ref.id, "draw", $("rg-draw-hint").value.trim());
+      showMessage("¡Desafío enviado al chat! La otra persona puede tocar «Jugar ahora».");
       showHomePanel();
     } catch(err) {console.error(err);showMessage("No se pudo guardar el dibujo. Prueba con un dibujo más sencillo.");}
   });
@@ -957,6 +1084,31 @@ async function joinGame(id, game) {
     watchGame(id);
   } catch(err) {console.error(err);showMessage("No se pudo aceptar el desafío. Puede que otra persona ya lo haya aceptado.");}
 }
+
+// El botón «Jugar ahora» de una invitación del chat abre la partida real.
+window.addEventListener("rolitas:open-game", async (event) => {
+  const gameId = event.detail?.gameId;
+  if (!gameId || !currentUser) return;
+  try {
+    const snapshot = await getDoc(doc(db, "games", gameId));
+    if (!snapshot.exists()) {
+      showMessage("Esta partida ya no existe.");
+      openGamesScreen();
+      return;
+    }
+    const game = { id: snapshot.id, ...snapshot.data() };
+    openGamesScreen();
+    if (game.creatorUid !== currentUser.uid && game.status === "open") {
+      await joinGame(gameId, game);
+    } else {
+      watchGame(gameId);
+    }
+  } catch (error) {
+    console.error("No se pudo abrir la invitación:", error);
+    showMessage("No se pudo abrir la partida. Revisa tu conexión y los permisos de Firestore.");
+  }
+});
+
 function watchGame(id) {
   if (activeGameStop) activeGameStop();
   activeGameStop = onSnapshot(doc(db,"games",id), snap => {
@@ -1052,6 +1204,238 @@ function renderGameDetail(game) {
     });
   }
 }
+
+
+/* ==========================================================
+   MODOS INDIVIDUALES + BANCO DE PALABRAS + SOPA DE LETRAS
+   Los modos individuales se guardan localmente y no requieren
+   crear documentos en Firestore.
+========================================================== */
+
+const SOLO_WORD_BANK = {"Comida": "MANZANA,PERA,FRESA,UVA,MANGO,PIÑA,BANANO,NARANJA,LIMON,SANDIA,MELON,CEREZA,PAPAYA,COCO,DURAZNO,KIWI,AGUACATE,TOMATE,ZANAHORIA,CEBOLLA", "Animales": "PERRO,GATO,CABALLO,VACA,CONEJO,TORTUGA,DELFIN,AGUILA,LEON,TIGRE,JIRAFA,ELEFANTE,MONO,PINGUINO,KOALA,ZORRO,LOBO,ARDILLA,MARIPOSA,ABEJA", "Ropa": "CAMISA,PANTALON,FALDA,VESTIDO,CHAQUETA,ABRIGO,ZAPATOS,BOTAS,SOMBRERO,GORRA,BUFANDA,GUANTES,CINTURON,CALCETINES,PIJAMA,BLUSA,SHORT,SUETER,MEDIAS,UNIFORME", "Ciudades": "MEDELLIN,BOGOTA,CALI,CARTAGENA,PASTO,MANIZALES,ARMENIA,IBAGUE,CUCUTA,MONTERIA,QUIBDO,POPAYAN,NEIVA,VALLEDUPAR,SANTA MARTA,BUCARAMANGA,PEREIRA,ENVIGADO,BELLO,RIONEGRO", "Nombres": "SOFIA,VALENTINA,CAMILA,LAURA,ISABELA,MARIANA,JUAN,MATEO,SANTIAGO,SEBASTIAN,DANIEL,ANDRES,EMILIA,ANTONIA,SAMUEL,NICOLAS,LUCIANA,GABRIEL,MANUELA,ANGEL", "Deportes": "FUTBOL,BALONCESTO,VOLEIBOL,NATACION,CICLISMO,TENIS,BOXEO,ATLETISMO,GIMNASIA,BEISBOL,RUGBY,GOLF,ESGRIMA,SURF,AJEDREZ,PATINAJE,ESCALADA,BADMINTON,SKATE,SOFTBOL", "Objetos": "TELEFONO,COMPUTADOR,TECLADO,MOUSE,VENTANA,ESPEJO,CUCHARA,TENEDOR,PLATO,TAZA,MOCHILA,RELOJ,LAMPARA,LLAVE,TIJERAS,CUADERNO,LAPIZ,BOTELLA,PARAGUAS,MALETA", "Naturaleza": "MONTAÑA,RIO,LAGO,BOSQUE,PLAYA,VOLCAN,DESIERTO,SELVA,CASCADA,ARCOIRIS,ESTRELLA,PLANETA,COMETA,NUBE,TORMENTA,TRUENO,FLOR,ARBOL,ROSA,GIRASOL", "Profesiones": "MEDICO,ENFERMERO,PROFESOR,INGENIERO,ABOGADO,COCINERO,PANADERO,BOMBERO,PILOTO,ARQUITECTO,PERIODISTA,VETERINARIO,ARTISTA,MUSICO,ACTOR,DISEÑADOR,AGRICULTOR,POLICIA,DENTISTA,CIENTIFICO", "Transporte": "AUTOBUS,AVION,TREN,BICICLETA,MOTOCICLETA,CARRO,TAXI,HELICOPTERO,BARCO,CAMION,TRACTOR,METRO,LANCHA,SUBMARINO,COHETE,TRICICLO,TELEFERICO,AMBULANCIA,PATINETA,VELERO", "Videojuegos": "MINECRAFT,MARIO,SONIC,ROBLOX,FORTNITE,TETRIS,POKEMON,ZELDA,MORTAL KOMBAT,FREE FIRE,VALORANT,OVERWATCH,HALO,DOOM,PORTAL,TERRARIA,STARDEW,CRASH,SPYRO,CELESTE", "Casa": "COCINA,SALA,COMEDOR,ALCOBA,BAÑO,TECHO,PARED,PUERTA,VENTILADOR,NEVERA,ESTUFA,SOFA,CAMA,ALMOHADA,CORTINA,ALFOMBRA,DUCHA,ARMARIO,ESCALERA,BALCON", "Musica": "GUITARRA,PIANO,TAMBOR,FLAUTA,VIOLIN,BAJO,TROMPETA,ARPA,ACORDEON,MARACAS,CANCION,MELODIA,RITMO,CONCIERTO,DISCO,BAILE,ROCK,SALSA,MERENGUE,JAZZ"};
+
+const soloState = { mode: null, category: "Todas", word: "", guessed: [], mistakes: 0, strokes: [], selectedColor: "#29202d", grid: [], found: [], foundPaths: [], selecting: false, startCell: null, currentCell: null };
+const soloCategories = ["Todas", ...Object.keys(SOLO_WORD_BANK)];
+const soloNormalize = value => normalize(value).replace(/[^a-zñ]/g, "").toUpperCase();
+const soloRandom = list => list[Math.floor(Math.random() * list.length)];
+// Cada categoría está almacenada como una cadena separada por comas.
+// Convertimos esa cadena en palabras individuales antes de elegir una.
+const soloWords = category => {
+  const raw = category === "Todas"
+    ? Object.values(SOLO_WORD_BANK)
+    : [SOLO_WORD_BANK[category] || ""];
+  return raw
+    .flatMap(value => String(value).split(","))
+    .map(word => word.trim())
+    .filter(Boolean);
+};
+
+function soloPickWord(category) {
+  const words = soloWords(category).filter(w => !String(w).includes(" "));
+  return soloRandom(words);
+}
+function soloCategoryPicker() {
+  return `<div class="rg-category-box"><div class="rg-category-title">✦ Elige una categoría</div><select class="rg-select" id="rg-solo-category">${soloCategories.map(c => `<option>${escapeHtml(c)}</option>`).join("")}</select><div class="rg-small">La categoría te dará una pista sobre las palabras que pueden aparecer.</div></div>`;
+}
+
+// Pistas cortas: orientan sin revelar directamente la respuesta.
+const SOLO_HINTS = {
+  MANZANA:"Fruta crujiente que puede ser roja o verde", PERRO:"Animal doméstico que ladra", GATO:"Animal doméstico que maúlla",
+  CABALLO:"Animal que se puede montar", VACA:"Animal que produce leche", DELFIN:"Mamífero marino muy inteligente",
+  MARIPOSA:"Insecto con alas de muchos colores", ABEJA:"Insecto que produce miel", MEDELLIN:"Ciudad colombiana conocida como la ciudad de la eterna primavera",
+  BOGOTA:"Capital de Colombia", CALI:"Ciudad colombiana famosa por la salsa", CARTAGENA:"Ciudad caribeña con una ciudad amurallada",
+  SOFIA:"Nombre propio femenino", JUAN:"Nombre propio masculino de cuatro letras", MATEO:"Nombre propio masculino",
+  FUTBOL:"Deporte que se juega con un balón y dos arcos", TENIS:"Deporte de raqueta", NATACION:"Deporte que se practica en el agua",
+  TELEFONO:"Objeto que usamos para llamar y enviar mensajes", COMPUTADOR:"Equipo para trabajar, estudiar y jugar", RELOJ:"Objeto que indica la hora",
+  MONTAÑA:"Elevación natural grande del terreno", RIO:"Corriente natural de agua", PLAYA:"Lugar de arena junto al mar",
+  MEDICO:"Profesional que atiende la salud", PROFESOR:"Persona que enseña", COCINERO:"Persona que prepara alimentos",
+  AVION:"Medio de transporte que vuela", BICICLETA:"Transporte de dos ruedas que se mueve pedaleando", MOTOCICLETA:"Vehículo de dos ruedas con motor",
+  MINECRAFT:"Videojuego de bloques y construcción", MARIO:"Personaje de videojuegos que suele llevar gorra roja",
+  COCINA:"Lugar de la casa donde se preparan alimentos", NEVERA:"Electrodoméstico que mantiene fríos los alimentos",
+  GUITARRA:"Instrumento musical de cuerdas", PIANO:"Instrumento musical con teclas"
+};
+function soloCategoryOfWord(word) {
+  const target = soloNormalize(word);
+  for (const [name, raw] of Object.entries(SOLO_WORD_BANK)) {
+    const match = String(raw).split(",").some(item => soloNormalize(item.trim()) === target);
+    if (match) return name;
+  }
+  return "General";
+}
+const SOLO_CATEGORY_CLUES = {
+  Comida: "Es algo que se puede comer o beber",
+  Animales: "Es un ser vivo del reino animal",
+  Ropa: "Es una prenda o accesorio que usamos para vestirnos",
+  Ciudades: "Es una ciudad o municipio",
+  Nombres: "Es un nombre de persona",
+  Deportes: "Es una actividad deportiva",
+  Objetos: "Es un objeto que usamos en la vida diaria",
+  Naturaleza: "Es algo que encontramos en la naturaleza",
+  Profesiones: "Es un oficio o profesión",
+  Transporte: "Es un medio de transporte",
+  Videojuegos: "Es un videojuego o personaje de videojuegos",
+  Casa: "Es un espacio u objeto del hogar",
+  Musica: "Está relacionado con la música"
+};
+function soloHint(word, category) {
+  const clean = soloNormalize(word);
+  if (SOLO_HINTS[clean]) return SOLO_HINTS[clean];
+  const realCategory = soloCategoryOfWord(word);
+  return SOLO_CATEGORY_CLUES[realCategory] || `Pertenece a la categoría «${realCategory}»`;
+}
+function soloHome(mode) {
+  soloState.mode = mode;
+  soloState.category = "Todas";
+  showPanel("rg-create-panel");
+  const title = mode === "hangman" ? "🎯 Ahorcado individual" : mode === "draw" ? "🎨 Reto de dibujo individual" : "🔎 Sopa de letras individual";
+  $("rg-create-panel").innerHTML = `<div class="rg-intro"><h3>${title}</h3><p class="rg-muted">Juega a tu ritmo. Hay más de 200 palabras repartidas en 12 categorías.</p></div><div class="rg-form">${soloCategoryPicker()}<div class="rg-actions"><button class="rg-btn" id="rg-solo-start">Comenzar</button><button class="rg-btn secondary" id="rg-solo-cancel">Volver</button></div></div>`;
+  $("rg-solo-start").addEventListener("click", () => {
+    soloState.category = $("rg-solo-category").value;
+    if (mode === "hangman") soloStartHangman();
+    if (mode === "draw") soloStartDraw();
+    if (mode === "wordsearch") soloStartWordsearch();
+  });
+  $("rg-solo-cancel").addEventListener("click", showHomePanel);
+}
+
+function soloStartHangman() {
+  soloState.word = soloPickWord(soloState.category);
+  soloState.guessed = [];
+  soloState.mistakes = 0;
+  soloRenderHangman();
+}
+function soloRenderHangman() {
+  showPanel("rg-detail-panel");
+  const done = soloState.mistakes >= 6 || [...soloState.word].every(ch => !/[A-Z]/.test(ch) || soloState.guessed.includes(ch));
+  const won = [...soloState.word].every(ch => !/[A-Z]/.test(ch) || soloState.guessed.includes(ch));
+  const keys = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ".split("");
+  const display = [...soloState.word].map(ch => !/[A-ZÑ]/.test(ch) ? ch : soloState.guessed.includes(ch) || done ? ch : "_").join(" ");
+  $("rg-detail-panel").innerHTML = `<div class="rg-intro"><h3>🎯 Ahorcado</h3><p class="rg-muted">Categoría: ${escapeHtml(soloState.category)}</p></div><div class="rg-hangman">${hangmanSvg(soloState.mistakes)}</div><div class="rg-word">${display}</div><div class="rg-hint">💡 <strong>Pista:</strong> ${escapeHtml(soloHint(soloState.word, soloState.category))}</div><div class="rg-small" style="text-align:center">Errores: ${soloState.mistakes}/6</div><div class="rg-keyboard">${keys.map(k=>`<button class="rg-key" data-solo-letter="${k}" ${done||soloState.guessed.includes(k)?"disabled":""}>${k}</button>`).join("")}</div><div class="rg-status">${done ? (won ? "¡Correcto! 🎉" : "Se acabaron los intentos.") : "Encuentra la palabra antes de completar el ahorcado."}</div>${done?`<div class="rg-card rg-hangman-result"><strong>La palabra era: ${escapeHtml(soloState.word)}</strong><button class="rg-btn" id="rg-solo-again">Otra palabra</button></div>`:""}<button class="rg-btn secondary" id="rg-solo-exit">Volver a juegos</button>`;
+  $("rg-detail-panel").querySelectorAll("[data-solo-letter]").forEach(btn => btn.addEventListener("click", () => {
+    const letter = btn.dataset.soloLetter;
+    if (soloState.guessed.includes(letter)) return;
+    soloState.guessed.push(letter);
+    if (!soloState.word.includes(letter)) soloState.mistakes++;
+    soloRenderHangman();
+  }));
+  $("rg-solo-again")?.addEventListener("click", soloStartHangman);
+  $("rg-solo-exit").addEventListener("click", showHomePanel);
+}
+
+function soloStartDraw() {
+  soloState.word = soloPickWord(soloState.category);
+  soloState.strokes = [];
+  soloRenderDraw();
+}
+function soloRenderDraw() {
+  showPanel("rg-detail-panel");
+  $("rg-detail-panel").innerHTML = `<div class="rg-intro"><h3>🎨 Dibuja y adivina</h3><p class="rg-muted">Dibuja la palabra que te toque. Intenta representarla sin escribir letras.</p></div><div class="rg-card"><div class="rg-small">TU PALABRA SECRETA</div><h4>${escapeHtml(soloState.word)}</h4><p class="rg-muted">Categoría: ${escapeHtml(soloState.category)}</p><div class="rg-hint">💡 <strong>Idea para dibujar:</strong> ${escapeHtml(soloHint(soloState.word, soloState.category))}</div></div><div class="rg-canvas-wrap"><canvas id="rg-solo-canvas" width="720" height="460"></canvas></div><div class="rg-colors"><button class="rg-color selected" data-solo-color="#29202d" style="background:#29202d" type="button"></button><button class="rg-color" data-solo-color="#d84b91" style="background:#d84b91" type="button"></button><button class="rg-color" data-solo-color="#4777c8" style="background:#4777c8" type="button"></button><button class="rg-color" data-solo-color="#35a77b" style="background:#35a77b" type="button"></button><button class="rg-color" data-solo-color="#ffffff" style="background:#fff" type="button"></button><button class="rg-btn secondary" id="rg-solo-clear">Borrar</button></div><div class="rg-actions"><button class="rg-btn" id="rg-solo-finish-draw">Terminar reto</button><button class="rg-btn secondary" id="rg-solo-next-draw">Otra palabra</button></div><p class="rg-muted" id="rg-solo-draw-result"></p><button class="rg-btn secondary" id="rg-solo-exit">Volver a juegos</button>`;
+  const canvas = $("rg-solo-canvas");
+  drawCanvasBase(canvas);
+  let color = "#29202d", drawingNow = false, stroke = null;
+  const point = e => { const r=canvas.getBoundingClientRect(); return [Math.round((e.clientX-r.left)*canvas.width/r.width),Math.round((e.clientY-r.top)*canvas.height/r.height)]; };
+  const redraw = () => paintStrokes(canvas, soloState.strokes);
+  canvas.addEventListener("pointerdown", e => { drawingNow=true; canvas.setPointerCapture(e.pointerId); stroke={color,width:10,points:[point(e)]}; soloState.strokes.push(stroke); redraw(); });
+  canvas.addEventListener("pointermove", e => { if(!drawingNow||!stroke)return; const p=point(e), last=stroke.points.at(-1); if(Math.abs(p[0]-last[0])+Math.abs(p[1]-last[1])>3) stroke.points.push(p); redraw(); });
+  const stop=()=>{drawingNow=false;stroke=null;};
+  canvas.addEventListener("pointerup",stop); canvas.addEventListener("pointercancel",stop);
+  $("rg-detail-panel").querySelectorAll("[data-solo-color]").forEach(b=>b.addEventListener("click",()=>{color=b.dataset.soloColor; if(stroke)stroke.color=color; $("rg-detail-panel").querySelectorAll("[data-solo-color]").forEach(x=>x.classList.toggle("selected",x===b));}));
+  // Use the selected color for the next stroke.
+  canvas.addEventListener("pointerdown",()=>{ if(stroke) stroke.color=color; });
+  $("rg-solo-clear").addEventListener("click",()=>{soloState.strokes=[];drawCanvasBase(canvas);});
+  $("rg-solo-finish-draw").addEventListener("click",()=>{ $("rg-solo-draw-result").textContent = soloState.strokes.length ? `¡Reto terminado! Tu dibujo representaba: ${soloState.word}.` : "Primero haz un dibujo."; });
+  $("rg-solo-next-draw").addEventListener("click",soloStartDraw);
+  $("rg-solo-exit").addEventListener("click",showHomePanel);
+}
+
+function soloBuildGrid() {
+  const words = soloWords(soloState.category).filter(w => /^[A-ZÑ]+$/.test(soloNormalize(w))).map(soloNormalize).filter(w=>w.length>=3&&w.length<=12);
+  const chosen = [...new Set(words)].sort(()=>Math.random()-.5).slice(0,10);
+  const n=12, grid=Array.from({length:n},()=>Array(n).fill(""));
+  const dirs=[[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]];
+  const placed=[];
+  for(const word of chosen.sort((a,b)=>b.length-a.length)){
+    let ok=false;
+    for(let tries=0;tries<180&&!ok;tries++){
+      const [dr,dc]=soloRandom(dirs), r=Math.floor(Math.random()*n), c=Math.floor(Math.random()*n);
+      const er=r+dr*(word.length-1), ec=c+dc*(word.length-1);
+      if(er<0||er>=n||ec<0||ec>=n)continue;
+      let fits=true;
+      for(let i=0;i<word.length;i++){const v=grid[r+dr*i][c+dc*i];if(v&&v!==word[i]){fits=false;break;}}
+      if(!fits)continue;
+      for(let i=0;i<word.length;i++)grid[r+dr*i][c+dc*i]=word[i];
+      placed.push(word);ok=true;
+    }
+  }
+  const alphabet="ABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
+  for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(!grid[r][c])grid[r][c]=soloRandom(alphabet);
+  return {grid,words:placed};
+}
+function soloStartWordsearch() {
+  const puzzle=soloBuildGrid();
+  if (!puzzle.words.length) {
+    $("rg-create-panel").innerHTML = `<div class="rg-intro"><h3>🔎 Sopa de letras</h3><p class="rg-muted">No se pudieron preparar palabras para esta categoría. Intenta con «Todas» o elige otra categoría.</p></div><div class="rg-actions"><button class="rg-btn" id="rg-solo-retry">Intentar de nuevo</button><button class="rg-btn secondary" id="rg-solo-cancel">Volver</button></div>`;
+    $("rg-solo-retry").addEventListener("click", soloStartWordsearch);
+    $("rg-solo-cancel").addEventListener("click", showHomePanel);
+    return;
+  }
+  soloState.grid=puzzle.grid; soloState.wordList=puzzle.words; soloState.found=[]; soloState.foundPaths=[]; soloState.selecting=false; soloState.startCell=null; soloState.currentCell=null;
+  soloRenderWordsearch();
+}
+function soloRenderWordsearch() {
+  showPanel("rg-detail-panel");
+  const n=soloState.grid.length;
+  $("rg-detail-panel").innerHTML=`<div class="rg-intro"><h3>🔎 Sopa de letras</h3><p class="rg-muted">${escapeHtml(soloState.category)} · Encuentra las palabras en cualquier dirección.</p></div><div class="rg-row"><span class="rg-tag">${soloState.found.length}/${soloState.wordList.length} encontradas</span><span class="rg-small">12 × 12</span></div><div id="rg-word-grid" style="display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:3px;touch-action:none;user-select:none;margin:12px 0"></div><div class="rg-small">Palabras por encontrar</div><div class="rg-guess-list">${soloState.wordList.map(w=>{const found=soloState.found.includes(w);return `<span class="rg-guess ${found?"rg-word-found":""}" data-word="${escapeHtml(w)}" style="${found?"border-color:rgba(65,205,139,.7);background:rgba(35,155,100,.24);color:#a9f2cb;":""}">${found?"✓ ":""}${w.toUpperCase()} <small style="display:block;font-size:9px;opacity:.82">${escapeHtml(soloCategoryOfWord(w))}</small></span>`;}).join("")}</div><div class="rg-hint">💡 <strong>Pista:</strong> Todas las palabras pertenecen a «${escapeHtml(soloState.category)}». Busca en horizontal, vertical y diagonal; también pueden estar al revés.</div><p class="rg-status" id="rg-word-feedback">${soloState.wordList.length > 0 && soloState.found.length===soloState.wordList.length?"¡Completaste la sopa! 🎉":"Toca una letra y arrastra en línea recta hasta la última."}</p><div class="rg-actions"><button class="rg-btn" id="rg-word-new">Nueva sopa</button><button class="rg-btn secondary" id="rg-solo-exit">Volver a juegos</button></div>`;
+  const gridEl=$("rg-word-grid");
+  soloState.grid.forEach((row,r)=>row.forEach((letter,c)=>{
+    const cell=document.createElement("button");cell.type="button";cell.textContent=letter;cell.dataset.r=r;cell.dataset.c=c;cell.style.cssText="aspect-ratio:1;min-width:0;padding:0;border:1px solid rgba(255,255,255,.13);border-radius:5px;background:rgba(255,255,255,.10);color:#fff;font-weight:800;font-size:clamp(10px,3vw,15px);";
+    gridEl.appendChild(cell);
+  }));
+  const cellAt=e=>{const el=document.elementFromPoint(e.clientX,e.clientY)?.closest("#rg-word-grid button");return el?{r:+el.dataset.r,c:+el.dataset.c}:null;};
+  const lineCells=(a,b)=>{const dr=b.r-a.r,dc=b.c-a.c,steps=Math.max(Math.abs(dr),Math.abs(dc));if(!steps)return[a];if(!(dr===0||dc===0||Math.abs(dr)===Math.abs(dc)))return[];const sr=Math.sign(dr),sc=Math.sign(dc);return Array.from({length:steps+1},(_,i)=>({r:a.r+sr*i,c:a.c+sc*i}));};
+  const paintFoundPaths=()=>{soloState.foundPaths.forEach(path=>path.forEach(p=>{const x=gridEl.querySelector(`[data-r="${p.r}"][data-c="${p.c}"]`);if(x){x.style.background="rgba(35,165,105,.78)";x.style.borderColor="rgba(130,245,185,.8)";x.style.color="#fff";}}));};
+  const highlight=(cells)=>{gridEl.querySelectorAll("button").forEach(x=>{x.style.background="rgba(255,255,255,.10)";x.style.borderColor="rgba(255,255,255,.13)";x.style.color="#fff";});paintFoundPaths();cells.forEach(p=>{const x=gridEl.querySelector(`[data-r="${p.r}"][data-c="${p.c}"]`);if(x&&!x.dataset.found){x.style.background="rgba(224,92,174,.75)";}});};
+  paintFoundPaths();
+  const finish=()=>{
+    if(!soloState.startCell||!soloState.currentCell)return;
+    const cells=lineCells(soloState.startCell,soloState.currentCell), value=cells.map(p=>soloState.grid[p.r][p.c]).join("");
+    const reverse=value.split("").reverse().join("");
+    const match=soloState.wordList.find(w=>(w===value||w===reverse)&&!soloState.found.includes(w));
+    if(match){
+      soloState.found.push(match);
+      soloState.foundPaths.push(cells.map(p=>({...p})));
+      cells.forEach(p=>{
+        const x=gridEl.querySelector(`[data-r="${p.r}"][data-c="${p.c}"]`);
+        if(x){x.dataset.found="1";x.style.background="rgba(35,165,105,.78)";x.style.borderColor="rgba(130,245,185,.8)";x.style.color="#fff";}
+      });
+      // Actualiza también la ficha de la palabra, sin tener que reconstruir la sopa.
+      const wordChip=[...$("rg-detail-panel").querySelectorAll(".rg-guess[data-word]")].find(chip=>chip.dataset.word===match);
+      if(wordChip){
+        wordChip.classList.add("rg-word-found");
+        wordChip.style.borderColor="rgba(65,205,139,.7)";
+        wordChip.style.background="rgba(35,155,100,.24)";
+        wordChip.style.color="#a9f2cb";
+        wordChip.innerHTML=`✓ ${escapeHtml(match.toUpperCase())} <small style="display:block;font-size:9px;opacity:.9">${escapeHtml(soloCategoryOfWord(match))} · Encontrada</small>`;
+      }
+      const counter=document.querySelector("#rg-detail-panel .rg-tag");
+      if(counter)counter.textContent=`${soloState.found.length}/${soloState.wordList.length} encontradas`;
+      $("rg-word-feedback").textContent=soloState.found.length===soloState.wordList.length?"¡Completaste la sopa! 🎉":`¡Encontraste ${match}! Sigue buscando las demás.`;
+    }
+    else highlight([]);
+    soloState.startCell=null;soloState.currentCell=null;soloState.selecting=false;
+    if(soloState.wordList.length > 0 && soloState.found.length===soloState.wordList.length){$("rg-word-feedback").textContent="¡Completaste la sopa! 🎉";gridEl.querySelectorAll("button").forEach(b=>b.disabled=true);}
+  };
+  gridEl.addEventListener("pointerdown",e=>{const p=cellAt(e);if(!p)return;e.preventDefault();soloState.selecting=true;soloState.startCell=p;soloState.currentCell=p;gridEl.setPointerCapture?.(e.pointerId);highlight([p]);});
+  gridEl.addEventListener("pointermove",e=>{if(!soloState.selecting)return;const p=cellAt(e);if(!p)return;soloState.currentCell=p;highlight(lineCells(soloState.startCell,p));});
+  gridEl.addEventListener("pointerup",e=>{if(!soloState.selecting)return;const p=cellAt(e);if(p)soloState.currentCell=p;finish();});
+  gridEl.addEventListener("pointercancel",()=>{soloState.selecting=false;highlight([]);});
+  $("rg-word-new").addEventListener("click",soloStartWordsearch);
+  $("rg-solo-exit").addEventListener("click",showHomePanel);
+}
+
+$("rg-solo-hangman")?.addEventListener("click",()=>soloHome("hangman"));
+$("rg-solo-wordsearch")?.addEventListener("click",()=>soloHome("wordsearch"));
+
 
 $("rg-back")?.addEventListener("click", () => {
   const detailVisible = !$("rg-detail-panel").hidden;

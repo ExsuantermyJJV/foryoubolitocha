@@ -12,13 +12,18 @@ import {
 
   getAuth,
 
+  setPersistence,
+
+  browserLocalPersistence,
+
   onAuthStateChanged,
 
   signInWithEmailAndPassword,
 
   createUserWithEmailAndPassword,
 
-  signOut
+  signOut,
+  sendPasswordResetEmail
 
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
@@ -105,6 +110,26 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
+
+// Lista permitida: se validan UID Y correo para evitar cuentas con el mismo email
+// pero una identidad de Firebase diferente.
+const CHAT_ALLOWED_USERS = Object.freeze({
+  "ZdFf6SgJ41gaEpt7Yl9qMBVQrsm1": "montserratdelgado555@gmail.com",
+  "8pYAVJvtRXhExidqcs9RjxuLAUk2": "theexsuanter@gmail.com"
+});
+
+function isAllowedChatUser(user) {
+  if (!user?.uid || !user?.email) return false;
+  const expectedEmail = CHAT_ALLOWED_USERS[user.uid];
+  return Boolean(expectedEmail) &&
+    user.email.trim().toLowerCase() === expectedEmail;
+}
+
+function isAllowedChatEmail(email) {
+  const normalized = String(email || "").trim().toLowerCase();
+  return Object.values(CHAT_ALLOWED_USERS).includes(normalized);
+}
+
 
 const db = getFirestore(app);
 
@@ -294,6 +319,220 @@ function clearReplyTarget() {
 
 }
 
+function installGameInviteCardStyles() {
+
+  if (document.getElementById("rolitas-game-invite-card-styles")) return;
+
+  const gameInviteStyle = document.createElement("style");
+
+  gameInviteStyle.id = "rolitas-game-invite-card-styles";
+
+  gameInviteStyle.textContent = `
+
+    #chat-messages .chat-game-invite {
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 9px;
+
+      width: min(100%, 280px);
+
+      margin: 8px 0 2px;
+
+      padding: 12px;
+
+      box-sizing: border-box;
+
+      border: 1px solid rgba(205, 105, 169, .32);
+
+      border-radius: 15px;
+
+      background: linear-gradient(145deg, rgba(198, 91, 160, .13), rgba(255, 255, 255, .045));
+
+    }
+
+    #chat-messages .chat-game-invite-title {
+
+      color: #d66bb3;
+
+      font-size: 13px;
+
+      font-weight: 800;
+
+    }
+
+    #chat-messages .chat-game-invite-description {
+
+      margin: 0;
+
+      font-size: 11px;
+
+      line-height: 1.45;
+
+      opacity: .84;
+
+    }
+
+    #chat-messages .chat-game-invite-hint {
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 3px;
+
+      padding: 8px 9px;
+
+      border-radius: 9px;
+
+      background: rgba(255, 255, 255, .07);
+
+    }
+
+    #chat-messages .chat-game-invite-hint-label {
+
+      color: #bd6b9d;
+
+      font-size: 9px;
+
+      font-weight: 800;
+
+      letter-spacing: .08em;
+
+    }
+
+    #chat-messages .chat-game-invite-hint-text {
+
+      font-size: 11px;
+
+      overflow-wrap: anywhere;
+
+    }
+
+    #chat-messages .chat-game-invite-play {
+
+      min-height: 38px;
+
+      border: 0;
+
+      border-radius: 10px;
+
+      padding: 8px 12px;
+
+      background: linear-gradient(135deg, #df75bd, #a94f9b);
+
+      color: #fff;
+
+      font-size: 11px;
+
+      font-weight: 800;
+
+      cursor: pointer;
+
+    }
+
+    #chat-messages .chat-game-invite-play:active {
+
+      transform: scale(.98);
+
+    }
+
+    #chat-messages .chat-unread-divider {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 10px;
+
+      margin: 12px 4px;
+
+      color: #b66a98;
+
+      font-size: 9px;
+
+      font-weight: 800;
+
+      letter-spacing: .09em;
+
+      text-align: center;
+
+    }
+
+    #chat-messages .chat-unread-divider::before,
+
+    #chat-messages .chat-unread-divider::after {
+
+      content: "";
+
+      height: 1px;
+
+      flex: 1;
+
+      background: rgba(182, 106, 152, .35);
+
+    }
+
+  `;
+
+  document.head.appendChild(gameInviteStyle);
+
+}
+
+installGameInviteCardStyles();
+
+function installMessageStatusStyles() {
+
+  if (document.getElementById("rolitas-message-status-styles")) return;
+
+  const style = document.createElement("style");
+
+  style.id = "rolitas-message-status-styles";
+
+  style.textContent = `
+
+    #chat-messages .chat-bubble--mine .chat-bubble-meta .chat-message-status {
+
+      display: inline-flex !important;
+
+      visibility: visible !important;
+
+      opacity: 1 !important;
+
+      margin-left: 5px;
+
+      font-size: 11px;
+
+      line-height: 1;
+
+      color: #9299a2;
+
+      letter-spacing: -2px;
+
+      vertical-align: middle;
+
+      white-space: nowrap;
+
+    }
+
+    #chat-messages .chat-bubble--mine .chat-bubble-meta .chat-message-status.is-read {
+
+      color: #2998f0 !important;
+
+    }
+
+  `;
+
+  document.head.appendChild(style);
+
+}
+
+installMessageStatusStyles();
+
 function setReplyTarget(message) {
 
   replyingTo = {
@@ -309,26 +548,6 @@ function setReplyTarget(message) {
   };
 
   ensureReplyComposer();
-
-(function installMessageStatusStyles() {
-
-  if (document.getElementById("rolitas-message-status-styles")) return;
-
-  const style = document.createElement("style");
-
-  style.id = "rolitas-message-status-styles";
-
-  style.textContent = `
-
-    .chat-message-status{display:inline-block;margin-left:5px;font-size:11px;line-height:1;color:#9299a2;letter-spacing:-2px;vertical-align:middle}
-
-    .chat-message-status.is-read{color:#2998f0}
-
-  `;
-
-  document.head.appendChild(style);
-
-})();
 
   replyPreviewAuthor.textContent = `Respondiendo a ${replyingTo.senderName}`;
 
@@ -450,6 +669,100 @@ function formatFileSize(bytes) {
 
 }
 
+let imageViewerOverlay = null;
+
+function ensureImageViewer() {
+  if (imageViewerOverlay) return imageViewerOverlay;
+
+  const style = document.createElement("style");
+  style.id = "rolitas-image-viewer-styles";
+  style.textContent = `
+    .rolitas-image-viewer {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      box-sizing: border-box;
+      background: rgba(12, 8, 14, .92);
+      cursor: zoom-out;
+    }
+    .rolitas-image-viewer[hidden] { display: none !important; }
+    .rolitas-image-viewer img {
+      display: block;
+      max-width: min(96vw, 1500px);
+      max-height: 92vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 10px;
+      box-shadow: 0 12px 50px rgba(0,0,0,.45);
+      cursor: default;
+    }
+    .rolitas-image-viewer-close {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,.16);
+      color: #fff;
+      font-size: 30px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .chat-attachment img { cursor: zoom-in; }
+  `;
+  document.head.appendChild(style);
+
+  imageViewerOverlay = document.createElement("div");
+  imageViewerOverlay.className = "rolitas-image-viewer";
+  imageViewerOverlay.hidden = true;
+  imageViewerOverlay.setAttribute("role", "dialog");
+  imageViewerOverlay.setAttribute("aria-modal", "true");
+  imageViewerOverlay.setAttribute("aria-label", "Vista ampliada de imagen");
+
+  const closeButton = document.createElement("button");
+  closeButton.type = "button";
+  closeButton.className = "rolitas-image-viewer-close";
+  closeButton.textContent = "×";
+  closeButton.setAttribute("aria-label", "Cerrar imagen");
+
+  const fullImage = document.createElement("img");
+  fullImage.alt = "";
+
+  const closeViewer = () => {
+    imageViewerOverlay.hidden = true;
+    fullImage.removeAttribute("src");
+  };
+
+  closeButton.addEventListener("click", closeViewer);
+  imageViewerOverlay.addEventListener("click", (event) => {
+    if (event.target === imageViewerOverlay) closeViewer();
+  });
+  fullImage.addEventListener("click", (event) => event.stopPropagation());
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && imageViewerOverlay && !imageViewerOverlay.hidden) {
+      closeViewer();
+    }
+  });
+
+  imageViewerOverlay.append(closeButton, fullImage);
+  document.body.appendChild(imageViewerOverlay);
+  imageViewerOverlay._showImage = (url, alt) => {
+    fullImage.src = url;
+    fullImage.alt = alt || "Imagen adjunta";
+    imageViewerOverlay.hidden = false;
+    closeButton.focus();
+  };
+
+  return imageViewerOverlay;
+}
+
 function createAttachmentElement(attachment) {
 
   const wrapper = document.createElement("div");
@@ -464,14 +777,6 @@ function createAttachmentElement(attachment) {
 
   if (url && type.startsWith("image/")) {
 
-    const link = document.createElement("a");
-
-    link.href = url;
-
-    link.target = "_blank";
-
-    link.rel = "noopener noreferrer";
-
     const image = document.createElement("img");
 
     image.src = url;
@@ -480,9 +785,20 @@ function createAttachmentElement(attachment) {
 
     image.loading = "lazy";
 
-    link.appendChild(image);
+    image.tabIndex = 0;
+    image.setAttribute("role", "button");
+    image.setAttribute("aria-label", `Ampliar imagen: ${name}`);
 
-    wrapper.appendChild(link);
+    const openImage = () => ensureImageViewer()._showImage(url, name);
+    image.addEventListener("click", openImage);
+    image.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openImage();
+      }
+    });
+
+    wrapper.appendChild(image);
 
   } else if (url && type.startsWith("video/")) {
 
@@ -555,13 +871,22 @@ let peerPresence = null;
 let lastRenderedDocs = [];
 
 // Historial anterior al bloque que permanece escuchándose en tiempo real.
+
 let olderMessagesDocs = [];
+
 let oldestLoadedMessageDoc = null;
+
 let loadingOlderMessages = false;
+
 let hasMoreOlderMessages = true;
+
 let latestLiveMessagesDocs = [];
 
 let firstMessagesSnapshot = true;
+
+let hasReceivedServerSnapshot = false;
+
+let readBaselineReady = false;
 
 let pendingInitialScroll = true;
 
@@ -1083,7 +1408,7 @@ function formatMessageDate(timestamp) {
 
 function getReadStorageKey(user) {
 
-  return `nuestrasRolitas:lastRead:${user.uid}`;
+  return `nuestrasRolitas:lastRead:v7:${user.uid}`;
 
 }
 
@@ -1131,13 +1456,23 @@ function saveLastReadMillis(value) {
 
   if (!millis) return;
 
-  localStorage.setItem(
+  const key = getReadStorageKey(currentUser);
 
-    getReadStorageKey(currentUser),
+  const currentMarker = Number(localStorage.getItem(key) || 0);
 
-    String(millis)
+  // La marca de lectura solo puede avanzar, nunca retroceder.
+
+  // Así, mensajes antiguos no vuelven a aparecer como pendientes.
+
+  const nextMarker = Math.max(
+
+    Number.isFinite(currentMarker) ? currentMarker : 0,
+
+    millis
 
   );
+
+  localStorage.setItem(key, String(nextMarker));
 
 }
 
@@ -1285,6 +1620,8 @@ function findFirstUnreadIncoming(docs, lastReadMillis) {
 
       data.senderUid !== currentUser.uid &&
 
+      !data.readAt &&
+
       timestamp > lastReadMillis
 
     );
@@ -1295,55 +1632,21 @@ function findFirstUnreadIncoming(docs, lastReadMillis) {
 
 function initializeReadMarkerIfNeeded(docs) {
 
-  if (!currentUser || !docs.length) return;
+  if (!currentUser) return;
 
   const key = getReadStorageKey(currentUser);
 
-  if (localStorage.getItem(key) !== null) return;
+  // Guardar una sola vez el instante real de instalación/primer acceso
 
-  // No considerar todo el historial como nuevo.
+  // con conexión al servidor. Todo lo anterior queda como historial.
 
-  // Tomar como punto de partida el último mensaje propio.
+  // La marca persiste y no se reinicia al cerrar o volver a abrir el chat.
 
-  let baseline = 0;
+  if (localStorage.getItem(key) === null) {
 
-  for (let i = docs.length - 1; i >= 0; i--) {
-
-    const data = docs[i].data();
-
-    if (data.senderUid === currentUser.uid) {
-
-      baseline = getTimestampMillis(data.createdAt);
-
-      break;
-
-    }
+    localStorage.setItem(key, String(Date.now()));
 
   }
-
-  // Si nunca se ha enviado un mensaje propio,
-
-  // iniciar al final para no marcar todo el historial antiguo.
-
-  if (!baseline) {
-
-    for (let i = docs.length - 1; i >= 0; i--) {
-
-      const data = docs[i].data();
-
-      if (data.senderUid !== currentUser.uid) {
-
-        baseline = getTimestampMillis(data.createdAt);
-
-        break;
-
-      }
-
-    }
-
-  }
-
-  localStorage.setItem(key, String(baseline));
 
 }
 
@@ -1424,6 +1727,8 @@ function markConversationReadIfAtBottom() {
   if (
 
     !currentUser ||
+
+    !isChatScreenVisible() ||
 
     !lastRenderedDocs.length ||
 
@@ -1609,6 +1914,88 @@ function renderMessages(docs, { initial = false } = {}) {
 
     }
 
+    if (data.gameInvite && typeof data.gameInvite === "object" && data.gameInvite.gameId) {
+
+      const gameInviteData = data.gameInvite;
+
+      const isHangmanInvite = gameInviteData.type === "hangman";
+
+      const gameInviteCard = document.createElement("section");
+
+      gameInviteCard.className = "chat-game-invite";
+
+      const gameInviteTitle = document.createElement("strong");
+
+      gameInviteTitle.className = "chat-game-invite-title";
+
+      gameInviteTitle.textContent = isHangmanInvite
+
+        ? "🎯 Desafío de ahorcado"
+
+        : "🎨 Dibuja y adivina";
+
+      const gameInviteDescription = document.createElement("p");
+
+      gameInviteDescription.className = "chat-game-invite-description";
+
+      gameInviteDescription.textContent = isHangmanInvite
+
+        ? "Hay una palabra secreta esperándote. ¡Descúbrela!"
+
+        : "Te han enviado un dibujo. ¡Entra y trata de adivinarlo!";
+
+      gameInviteCard.append(gameInviteTitle, gameInviteDescription);
+
+      if (gameInviteData.hint) {
+
+        const gameInviteHint = document.createElement("div");
+
+        gameInviteHint.className = "chat-game-invite-hint";
+
+        const gameInviteHintLabel = document.createElement("small");
+
+        gameInviteHintLabel.className = "chat-game-invite-hint-label";
+
+        gameInviteHintLabel.textContent = "PISTA";
+
+        const gameInviteHintText = document.createElement("span");
+
+        gameInviteHintText.className = "chat-game-invite-hint-text";
+
+        gameInviteHintText.textContent = String(gameInviteData.hint);
+
+        gameInviteHint.append(gameInviteHintLabel, gameInviteHintText);
+
+        gameInviteCard.appendChild(gameInviteHint);
+
+      }
+
+      const gameInvitePlayButton = document.createElement("button");
+
+      gameInvitePlayButton.type = "button";
+
+      gameInvitePlayButton.className = "chat-game-invite-play";
+
+      gameInvitePlayButton.textContent = "🎮 Jugar ahora";
+
+      gameInvitePlayButton.addEventListener("click", (event) => {
+
+        event.stopPropagation();
+
+        window.dispatchEvent(new CustomEvent("rolitas:open-game", {
+
+          detail: { gameId: gameInviteData.gameId }
+
+        }));
+
+      });
+
+      gameInviteCard.appendChild(gameInvitePlayButton);
+
+      bubble.appendChild(gameInviteCard);
+
+    }
+
     if (data.attachment && typeof data.attachment === "object") {
 
       bubble.appendChild(createAttachmentElement(data.attachment));
@@ -1639,6 +2026,8 @@ function renderMessages(docs, { initial = false } = {}) {
 
       checks.className = "chat-message-status";
 
+      checks.style.cssText = "display:inline-flex;visibility:visible;opacity:1;margin-left:5px;font-size:11px;line-height:1;color:#9299a2;letter-spacing:-2px;vertical-align:middle;white-space:nowrap";
+
       checks.setAttribute("aria-live", "polite");
 
       if (data.readAt) {
@@ -1646,6 +2035,8 @@ function renderMessages(docs, { initial = false } = {}) {
         checks.textContent = "✓✓";
 
         checks.classList.add("is-read");
+
+        checks.style.color = "#2998f0";
 
         checks.setAttribute("aria-label", "Leído");
 
@@ -1749,9 +2140,29 @@ function renderMessages(docs, { initial = false } = {}) {
 
     const timestamp = getTimestampMillis(data.createdAt);
 
-    if (!mine && timestamp > lastReadMillis && !firstUnreadElement) {
+    if (
+
+      readBaselineReady &&
+
+      !mine &&
+
+      !data.readAt &&
+
+      timestamp > lastReadMillis &&
+
+      !firstUnreadElement
+
+    ) {
 
       firstUnreadElement = bubble;
+
+      const unreadDivider = document.createElement("div");
+
+      unreadDivider.className = "chat-unread-divider";
+
+      unreadDivider.textContent = "MENSAJES SIN LEER";
+
+      messagesBox.appendChild(unreadDivider);
 
       bubble.classList.add("chat-first-unread");
 
@@ -1862,73 +2273,131 @@ function renderMessages(docs, { initial = false } = {}) {
     savedChatScrollTop = messagesBox.scrollTop;
 
   });
+
   requestAnimationFrame(updateJumpToLatestButton);
 
 }
 
 // Combina el historial paginado con los últimos mensajes en tiempo real.
+
 function combineLoadedMessages(liveDocs = latestLiveMessagesDocs) {
+
   const unique = new Map();
+
   [...olderMessagesDocs, ...liveDocs].forEach(item => unique.set(item.id, item));
+
   return [...unique.values()].sort((a, b) =>
+
     getTimestampMillis(a.data().createdAt) - getTimestampMillis(b.data().createdAt)
+
   );
+
 }
 
 // Botón flotante para volver al final sin interrumpir la lectura.
+
 let jumpToLatestButton = null;
+
 function ensureJumpToLatestButton() {
+
   if (!room || jumpToLatestButton) return;
+
   jumpToLatestButton = document.createElement("button");
+
   jumpToLatestButton.type = "button";
+
   jumpToLatestButton.className = "chat-jump-latest";
+
   jumpToLatestButton.textContent = "↓ Ir al mensaje más reciente";
+
   jumpToLatestButton.setAttribute("aria-label", "Ir al mensaje más reciente");
+
   jumpToLatestButton.hidden = true;
+
   jumpToLatestButton.addEventListener("click", () => {
+
     scrollChatToBottom();
+
     savedChatScrollTop = messagesBox?.scrollTop ?? 0;
+
     markConversationReadIfAtBottom();
+
     updateJumpToLatestButton();
+
   });
+
   room.appendChild(jumpToLatestButton);
+
 }
 
 function updateJumpToLatestButton() {
+
   if (!jumpToLatestButton || !messagesBox) return;
+
   jumpToLatestButton.hidden = !isChatScreenVisible() || isNearChatBottom();
+
 }
 
 async function loadOlderMessages() {
+
   if (!currentUser || !messagesBox || loadingOlderMessages || !hasMoreOlderMessages || !oldestLoadedMessageDoc) return;
+
   loadingOlderMessages = true;
+
   const requestedUid = currentUser.uid;
+
   try {
+
     const olderQuery = query(
+
       messagesRef,
+
       orderBy("createdAt", "desc"),
+
       startAfter(oldestLoadedMessageDoc),
+
       limit(50)
+
     );
+
     const snapshot = await getDocs(olderQuery);
+
     if (currentUser?.uid !== requestedUid) return;
+
     const pageDocs = snapshot.docs;
+
     if (pageDocs.length) {
+
       olderMessagesDocs = [...pageDocs.reverse(), ...olderMessagesDocs];
+
       oldestLoadedMessageDoc = pageDocs[0];
+
     }
+
     hasMoreOlderMessages = pageDocs.length === 50;
+
     const combined = combineLoadedMessages();
+
     lastRenderedDocs = combined;
+
     // renderMessages conserva el mensaje que estaba visible antes de insertar
+
     // los anteriores, evitando saltos en la lectura.
+
     renderMessages(combined, { initial: false });
+
   } catch (error) {
+
     console.error("No se pudo cargar el historial anterior:", error);
+
     if (sendError) sendError.textContent = "No se pudieron cargar mensajes anteriores. Inténtalo de nuevo.";
+
   } finally {
+
     loadingOlderMessages = false;
+
   }
+
 }
 
 ensureJumpToLatestButton();
@@ -1976,6 +2445,7 @@ messagesBox?.addEventListener("scroll", () => {
     scrollUpdateFrame = null;
 
     markConversationReadIfAtBottom();
+
     updateJumpToLatestButton();
 
   });
@@ -2004,13 +2474,22 @@ function startMessagesListener(user) {
 
   firstMessagesSnapshot = true;
 
+  hasReceivedServerSnapshot = false;
+
+  readBaselineReady = false;
+
   pendingInitialScroll = true;
 
   lastRenderedDocs = [];
+
   olderMessagesDocs = [];
+
   oldestLoadedMessageDoc = null;
+
   loadingOlderMessages = false;
+
   hasMoreOlderMessages = true;
+
   latestLiveMessagesDocs = [];
 
   // Traer los últimos 100 mensajes y ordenarlos
@@ -2039,38 +2518,77 @@ function startMessagesListener(user) {
 
       firstMessagesSnapshot = false;
 
+      // Firestore puede entregar primero una copia local incompleta y luego
+
+      // la confirmación del servidor. No usar la copia local para establecer
+
+      // el punto de lectura ni interpretar sus documentos históricos como nuevos.
+
+      const isFromCache = snapshot.metadata?.fromCache === true;
+
+      const isFirstServerSnapshot = !isFromCache && !hasReceivedServerSnapshot;
+
+      const serverBaselineWasReady = hasReceivedServerSnapshot;
+
+      if (isFirstServerSnapshot) {
+
+        hasReceivedServerSnapshot = true;
+
+      }
+
       const orderedDocs = [...snapshot.docs].reverse();
+
       if (!isInitialSnapshot && latestLiveMessagesDocs.length) {
+
         const currentIds = new Set(orderedDocs.map(item => item.id));
+
         const pushedOutOfLiveWindow = latestLiveMessagesDocs.filter(item => !currentIds.has(item.id));
+
         if (pushedOutOfLiveWindow.length) {
+
           const olderById = new Map(olderMessagesDocs.map(item => [item.id, item]));
+
           pushedOutOfLiveWindow.forEach(item => olderById.set(item.id, item));
+
           olderMessagesDocs = [...olderById.values()].sort((a, b) =>
+
             getTimestampMillis(a.data().createdAt) - getTimestampMillis(b.data().createdAt)
+
           );
+
         }
+
       }
+
       latestLiveMessagesDocs = orderedDocs;
+
       if (isInitialSnapshot) {
+
         oldestLoadedMessageDoc = snapshot.docs[snapshot.docs.length - 1] || null;
+
         hasMoreOlderMessages = snapshot.docs.length === 100;
+
       }
+
       const allLoadedDocs = combineLoadedMessages(orderedDocs);
 
-      // Inicializar la marca una sola vez en el primer acceso.
+      // La referencia inicial se establece solo con datos confirmados
 
-      if (isInitialSnapshot) {
+      // por el servidor, nunca con una copia local posiblemente incompleta.
+
+      if (isFirstServerSnapshot) {
 
         initializeReadMarkerIfNeeded(allLoadedDocs);
 
+        readBaselineReady = true;
+
       }
 
-      // Avisar únicamente por mensajes nuevos de la otra persona.
+      // Solo después de recibir la primera foto completa del servidor,
 
-      // Nunca notificar mensajes históricos de la primera carga.
+      // los documentos agregados se consideran mensajes realmente nuevos.
 
-      if (!isInitialSnapshot) {
+      if (serverBaselineWasReady && !isFromCache) {
 
         snapshot.docChanges().forEach(change => {
 
@@ -2114,7 +2632,7 @@ function startMessagesListener(user) {
 
       // Si la conversación ya está abierta y al final, marcar como leído.
 
-      if (isChatScreenVisible() && isNearChatBottom()) {
+      if (readBaselineReady && isChatScreenVisible() && isNearChatBottom()) {
 
         markIncomingMessagesRead(allLoadedDocs);
 
@@ -2149,77 +2667,11 @@ function startMessagesListener(user) {
 ========================================== */
 
 registerForm?.addEventListener("submit", async (event) => {
-
   event.preventDefault();
-
   if (registerError) {
-
-    registerError.textContent = "";
-
+    registerError.textContent =
+      "El registro está deshabilitado. Solo pueden entrar las dos cuentas autorizadas.";
   }
-
-  const email = registerEmail?.value.trim() || "";
-
-  const password = registerPassword?.value || "";
-
-  try {
-
-    if (registerError) {
-
-      registerError.textContent = "Creando cuenta...";
-
-    }
-
-    await createUserWithEmailAndPassword(
-
-      auth,
-
-      email,
-
-      password
-
-    );
-
-    registerForm.reset();
-
-    showStatus("Cuenta creada correctamente");
-
-  } catch (error) {
-
-    console.error("Error en el registro:", error);
-
-    const errors = {
-
-      "auth/email-already-in-use":
-
-        "Este correo ya está registrado.",
-
-      "auth/invalid-email":
-
-        "El correo electrónico no es válido.",
-
-      "auth/weak-password":
-
-        "La contraseña debe tener al menos 6 caracteres.",
-
-      "auth/network-request-failed":
-
-        "Comprueba tu conexión a internet."
-
-    };
-
-    if (registerError) {
-
-      registerError.textContent =
-
-        errors[error.code] ||
-
-        "No se pudo crear la cuenta. Inténtalo nuevamente.";
-
-    }
-
-  }
-
 });
 
 /* ==========================================
@@ -2242,6 +2694,12 @@ loginForm?.addEventListener("submit", async (event) => {
 
   const password = passwordInput?.value || "";
 
+  if (!isAllowedChatEmail(email)) {
+    if (loginError) loginError.textContent =
+      "Este chat es privado y ese correo no está autorizado.";
+    return;
+  }
+
   try {
 
     if (loginError) {
@@ -2250,15 +2708,14 @@ loginForm?.addEventListener("submit", async (event) => {
 
     }
 
-    await signInWithEmailAndPassword(
+    const credential = await signInWithEmailAndPassword(auth, email, password);
 
-      auth,
-
-      email,
-
-      password
-
-    );
+    if (!isAllowedChatUser(credential.user)) {
+      await signOut(auth);
+      if (loginError) loginError.textContent =
+        "La cuenta no coincide con las identidades autorizadas para este chat.";
+      return;
+    }
 
     if (passwordInput) {
 
@@ -2318,6 +2775,51 @@ loginForm?.addEventListener("submit", async (event) => {
 
 ========================================== */
 
+// Recuperación de contraseña con Firebase Authentication.
+function installPasswordRecovery() {
+  if (!loginForm || document.getElementById("chat-forgot-password")) return;
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.id = "chat-forgot-password";
+  button.textContent = "¿Olvidaste tu contraseña?";
+  button.style.cssText =
+    "display:block;margin:10px auto 0;padding:6px 10px;border:0;background:transparent;color:#ad5689;font:inherit;font-size:12px;text-decoration:underline;cursor:pointer";
+
+  button.addEventListener("click", async () => {
+    const email = emailInput?.value.trim() || "";
+    if (!isAllowedChatEmail(email)) {
+      if (loginError) loginError.textContent =
+        "Escribe uno de los correos autorizados para recuperar la clave.";
+      emailInput?.focus();
+      return;
+    }
+
+    button.disabled = true;
+    if (loginError) loginError.textContent = "Enviando enlace de recuperación...";
+    try {
+      await sendPasswordResetEmail(auth, email);
+      if (loginError) loginError.textContent =
+        "Solicitud enviada. Revisa la bandeja de entrada y spam del correo autorizado.";
+    } catch (error) {
+      console.error("Error enviando recuperación:", error);
+      const errors = {
+        "auth/invalid-email": "El correo no es válido.",
+        "auth/user-not-found": "No existe una cuenta con ese correo.",
+        "auth/too-many-requests": "Demasiados intentos. Inténtalo más tarde.",
+        "auth/network-request-failed": "Comprueba tu conexión a internet."
+      };
+      if (loginError) loginError.textContent =
+        errors[error.code] || "No se pudo enviar el enlace de recuperación.";
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  (loginError || loginForm).insertAdjacentElement("afterend", button);
+}
+installPasswordRecovery();
+
 logoutButton?.addEventListener("click", async () => {
 
   try {
@@ -2346,7 +2848,10 @@ sendForm?.addEventListener("submit", async (event) => {
 
   event.preventDefault();
 
-  if (!currentUser) return;
+  if (!isAllowedChatUser(currentUser)) {
+    if (sendError) sendError.textContent = "Esta cuenta no está autorizada para enviar mensajes.";
+    return;
+  }
 
   const text = messageInput?.value.trim() || "";
 
@@ -2384,7 +2889,7 @@ sendForm?.addEventListener("submit", async (event) => {
 
         const file = selectedFiles[index];
 
-        const safeName = file.name.replace(/[**\\\\**/]/g, "_");
+        const safeName = file.name.replace(/[**********\\\\\\\\\\\\\\\\\\\\\**********/:*?"<>|]/g, "_");
 
         const uniqueName = `${Date.now()}_${crypto.randomUUID()}_${safeName}`;
 
@@ -2518,7 +3023,33 @@ if (authLoading) {
 
 hideAllScreens();
 
-onAuthStateChanged(auth, (user) => {
+// Mantiene la sesión en este navegador aunque se cierre la pestaña o el navegador.
+
+// Firebase la conserva en almacenamiento local hasta cerrar sesión o borrar los datos del sitio.
+
+async function startAuthSession() {
+
+  try {
+
+    await setPersistence(auth, browserLocalPersistence);
+
+  } catch (error) {
+
+    console.error("No se pudo establecer la sesión persistente:", error);
+
+    if (authLoading) authLoading.hidden = true;
+
+    if (authScreen) authScreen.hidden = false;
+
+    showGate();
+
+    showStatus("No se pudo restaurar la sesión. Inicia sesión nuevamente.");
+
+    return;
+
+  }
+
+  onAuthStateChanged(auth, async (user) => {
 
   stopPresenceTracking();
 
@@ -2539,10 +3070,15 @@ onAuthStateChanged(auth, (user) => {
   }
 
   lastRenderedDocs = [];
+
   olderMessagesDocs = [];
+
   oldestLoadedMessageDoc = null;
+
   loadingOlderMessages = false;
+
   hasMoreOlderMessages = true;
+
   latestLiveMessagesDocs = [];
 
   savedChatScrollTop = null;
@@ -2570,9 +3106,15 @@ onAuthStateChanged(auth, (user) => {
     sendError.textContent = "";
 
   }
+  if (user && !isAllowedChatUser(user)) {
+    await signOut(auth);
+    currentUser = null;
+    showGate();
+    showStatus("Cuenta no autorizada para este chat");
+    return;
+  }
 
   if (user) {
-
     showChat();
 
     startMessagesListener(user);
@@ -2613,4 +3155,8 @@ onAuthStateChanged(auth, (user) => {
 
   }
 
-});
+  });
+
+}
+
+startAuthSession();

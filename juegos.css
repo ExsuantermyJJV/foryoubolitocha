@@ -421,3 +421,130 @@
 #rolitas-games-screen .rg-tabs {
   margin-top: 8px !important;
 }
+
+/* ==========================================================
+   MEJORA DE LEGIBILIDAD SOBRE EL FONDO DEL JUEGO
+   Mantiene visible la imagen, pero evita que compita con el texto.
+   ========================================================== */
+
+#rolitas-games-screen {
+  color: #fff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .28);
+}
+
+#rolitas-games-screen .rg-tabs {
+  background: rgba(20, 15, 25, .88) !important;
+  border-color: rgba(255, 255, 255, .16) !important;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .28) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(115%) !important;
+  backdrop-filter: blur(14px) saturate(115%) !important;
+}
+
+#rolitas-games-screen .rg-tab {
+  color: #f2e8f4 !important;
+  text-shadow: none !important;
+}
+
+#rolitas-games-screen .rg-tab.active {
+  color: #fff !important;
+  text-shadow: 0 1px 2px rgba(70, 20, 65, .35) !important;
+}
+
+#rolitas-games-screen .rg-card {
+  background: linear-gradient(
+    145deg,
+    rgba(27, 21, 33, .95),
+    rgba(37, 25, 43, .92)
+  ) !important;
+  border-color: rgba(255, 255, 255, .19) !important;
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, .38),
+    inset 0 1px 0 rgba(255, 255, 255, .09) !important;
+  -webkit-backdrop-filter: blur(13px) saturate(110%) !important;
+  backdrop-filter: blur(13px) saturate(110%) !important;
+}
+
+#rolitas-games-screen .rg-card::before {
+  opacity: .55 !important;
+}
+
+#rolitas-games-screen .rg-card h4,
+#rolitas-games-screen #rg-home > h4 {
+  color: #fff !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .45) !important;
+}
+
+#rolitas-games-screen .rg-muted,
+#rolitas-games-screen .rg-card p {
+  color: #e5dce9 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .55) !important;
+}
+
+#rolitas-games-screen .rg-small {
+  color: #cbbbd2 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .6) !important;
+}
+
+#rolitas-games-screen .rg-tag {
+  color: #ffd5ed !important;
+  background: rgba(112, 43, 91, .58) !important;
+  border-color: rgba(255, 166, 218, .32) !important;
+  text-shadow: none !important;
+}
+
+#rolitas-games-screen .rg-empty,
+#rolitas-games-screen .rg-status {
+  background: rgba(24, 18, 31, .92) !important;
+  border-color: rgba(255, 255, 255, .17) !important;
+  color: #f0e7f2 !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .25) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  backdrop-filter: blur(12px) !important;
+  text-shadow: none !important;
+}
+
+#rolitas-games-screen .rg-input,
+#rolitas-games-screen .rg-select {
+  background: rgba(20, 15, 26, .94) !important;
+  border-color: rgba(255, 255, 255, .24) !important;
+  color: #fff !important;
+}
+
+#rolitas-games-screen .rg-hangman {
+  background: rgba(25, 19, 32, .88) !important;
+  border-color: rgba(255, 255, 255, .16) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06) !important;
+}
+
+#rolitas-games-screen .rg-key {
+  background: linear-gradient(
+    145deg,
+    rgba(58, 42, 67, .98),
+    rgba(38, 27, 47, .98)
+  ) !important;
+  border-color: rgba(255, 255, 255, .19) !important;
+  color: #fff !important;
+  text-shadow: none !important;
+}
+
+#rolitas-games-screen .rg-guess {
+  background: rgba(52, 38, 61, .94) !important;
+  border-color: rgba(255, 255, 255, .15) !important;
+  color: #fff !important;
+}
+
+#rolitas-games-screen .rg-btn {
+  text-shadow: 0 1px 2px rgba(70, 20, 65, .35) !important;
+}
+
+#rolitas-games-screen button:focus-visible,
+#rolitas-games-screen input:focus-visible,
+#rolitas-games-screen select:focus-visible {
+  outline-color: #ffd0ea !important;
+}
+
+@media (max-width: 360px) {
+  #rolitas-games-screen .rg-card {
+    background: rgba(27, 21, 33, .97) !important;
+  }
+}
