@@ -23,6 +23,7 @@ import {
   createUserWithEmailAndPassword,
 
   signOut,
+
   sendPasswordResetEmail
 
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
@@ -112,24 +113,36 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 // Lista permitida: se validan UID Y correo para evitar cuentas con el mismo email
+
 // pero una identidad de Firebase diferente.
+
 const CHAT_ALLOWED_USERS = Object.freeze({
+
   "ZdFf6SgJ41gaEpt7Yl9qMBVQrsm1": "montserratdelgado555@gmail.com",
+
   "8pYAVJvtRXhExidqcs9RjxuLAUk2": "theexsuanter@gmail.com"
+
 });
 
 function isAllowedChatUser(user) {
+
   if (!user?.uid || !user?.email) return false;
+
   const expectedEmail = CHAT_ALLOWED_USERS[user.uid];
+
   return Boolean(expectedEmail) &&
+
     user.email.trim().toLowerCase() === expectedEmail;
+
 }
 
 function isAllowedChatEmail(email) {
-  const normalized = String(email || "").trim().toLowerCase();
-  return Object.values(CHAT_ALLOWED_USERS).includes(normalized);
-}
 
+  const normalized = String(email || "").trim().toLowerCase();
+
+  return Object.values(CHAT_ALLOWED_USERS).includes(normalized);
+
+}
 
 const db = getFirestore(app);
 
@@ -672,95 +685,169 @@ function formatFileSize(bytes) {
 let imageViewerOverlay = null;
 
 function ensureImageViewer() {
+
   if (imageViewerOverlay) return imageViewerOverlay;
 
   const style = document.createElement("style");
+
   style.id = "rolitas-image-viewer-styles";
+
   style.textContent = `
+
     .rolitas-image-viewer {
+
       position: fixed;
+
       inset: 0;
+
       z-index: 99999;
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       padding: 24px;
+
       box-sizing: border-box;
+
       background: rgba(12, 8, 14, .92);
+
       cursor: zoom-out;
+
     }
+
     .rolitas-image-viewer[hidden] { display: none !important; }
+
     .rolitas-image-viewer img {
+
       display: block;
+
       max-width: min(96vw, 1500px);
+
       max-height: 92vh;
+
       width: auto;
+
       height: auto;
+
       object-fit: contain;
+
       border-radius: 10px;
+
       box-shadow: 0 12px 50px rgba(0,0,0,.45);
+
       cursor: default;
+
     }
+
     .rolitas-image-viewer-close {
+
       position: absolute;
+
       top: 14px;
+
       right: 18px;
+
       width: 44px;
+
       height: 44px;
+
       border: 0;
+
       border-radius: 50%;
+
       background: rgba(255,255,255,.16);
+
       color: #fff;
+
       font-size: 30px;
+
       line-height: 1;
+
       cursor: pointer;
+
     }
+
     .chat-attachment img { cursor: zoom-in; }
+
   `;
+
   document.head.appendChild(style);
 
   imageViewerOverlay = document.createElement("div");
+
   imageViewerOverlay.className = "rolitas-image-viewer";
+
   imageViewerOverlay.hidden = true;
+
   imageViewerOverlay.setAttribute("role", "dialog");
+
   imageViewerOverlay.setAttribute("aria-modal", "true");
+
   imageViewerOverlay.setAttribute("aria-label", "Vista ampliada de imagen");
 
   const closeButton = document.createElement("button");
+
   closeButton.type = "button";
+
   closeButton.className = "rolitas-image-viewer-close";
+
   closeButton.textContent = "×";
+
   closeButton.setAttribute("aria-label", "Cerrar imagen");
 
   const fullImage = document.createElement("img");
+
   fullImage.alt = "";
 
   const closeViewer = () => {
+
     imageViewerOverlay.hidden = true;
+
     fullImage.removeAttribute("src");
+
   };
 
   closeButton.addEventListener("click", closeViewer);
+
   imageViewerOverlay.addEventListener("click", (event) => {
+
     if (event.target === imageViewerOverlay) closeViewer();
+
   });
+
   fullImage.addEventListener("click", (event) => event.stopPropagation());
+
   document.addEventListener("keydown", (event) => {
+
     if (event.key === "Escape" && imageViewerOverlay && !imageViewerOverlay.hidden) {
+
       closeViewer();
+
     }
+
   });
 
   imageViewerOverlay.append(closeButton, fullImage);
+
   document.body.appendChild(imageViewerOverlay);
+
   imageViewerOverlay._showImage = (url, alt) => {
+
     fullImage.src = url;
+
     fullImage.alt = alt || "Imagen adjunta";
+
     imageViewerOverlay.hidden = false;
+
     closeButton.focus();
+
   };
 
   return imageViewerOverlay;
+
 }
 
 function createAttachmentElement(attachment) {
@@ -786,16 +873,25 @@ function createAttachmentElement(attachment) {
     image.loading = "lazy";
 
     image.tabIndex = 0;
+
     image.setAttribute("role", "button");
+
     image.setAttribute("aria-label", `Ampliar imagen: ${name}`);
 
     const openImage = () => ensureImageViewer()._showImage(url, name);
+
     image.addEventListener("click", openImage);
+
     image.addEventListener("keydown", (event) => {
+
       if (event.key === "Enter" || event.key === " ") {
+
         event.preventDefault();
+
         openImage();
+
       }
+
     });
 
     wrapper.appendChild(image);
@@ -2356,7 +2452,7 @@ async function loadOlderMessages() {
 
       startAfter(oldestLoadedMessageDoc),
 
-      limit(50)
+      limit(30)
 
     );
 
@@ -2492,7 +2588,7 @@ function startMessagesListener(user) {
 
   latestLiveMessagesDocs = [];
 
-  // Traer los últimos 100 mensajes y ordenarlos
+  // Traer los últimos 30 mensajes y ordenarlos
 
   // del más antiguo al más reciente.
 
@@ -2502,7 +2598,7 @@ function startMessagesListener(user) {
 
     orderBy("createdAt", "desc"),
 
-    limit(100)
+    limit(30)
 
   );
 
@@ -2667,11 +2763,17 @@ function startMessagesListener(user) {
 ========================================== */
 
 registerForm?.addEventListener("submit", async (event) => {
+
   event.preventDefault();
+
   if (registerError) {
+
     registerError.textContent =
+
       "El registro está deshabilitado. Solo pueden entrar las dos cuentas autorizadas.";
+
   }
+
 });
 
 /* ==========================================
@@ -2695,9 +2797,13 @@ loginForm?.addEventListener("submit", async (event) => {
   const password = passwordInput?.value || "";
 
   if (!isAllowedChatEmail(email)) {
+
     if (loginError) loginError.textContent =
+
       "Este chat es privado y ese correo no está autorizado.";
+
     return;
+
   }
 
   try {
@@ -2711,10 +2817,15 @@ loginForm?.addEventListener("submit", async (event) => {
     const credential = await signInWithEmailAndPassword(auth, email, password);
 
     if (!isAllowedChatUser(credential.user)) {
+
       await signOut(auth);
+
       if (loginError) loginError.textContent =
+
         "La cuenta no coincide con las identidades autorizadas para este chat.";
+
       return;
+
     }
 
     if (passwordInput) {
@@ -2776,48 +2887,83 @@ loginForm?.addEventListener("submit", async (event) => {
 ========================================== */
 
 // Recuperación de contraseña con Firebase Authentication.
+
 function installPasswordRecovery() {
+
   if (!loginForm || document.getElementById("chat-forgot-password")) return;
 
   const button = document.createElement("button");
+
   button.type = "button";
+
   button.id = "chat-forgot-password";
+
   button.textContent = "¿Olvidaste tu contraseña?";
+
   button.style.cssText =
+
     "display:block;margin:10px auto 0;padding:6px 10px;border:0;background:transparent;color:#ad5689;font:inherit;font-size:12px;text-decoration:underline;cursor:pointer";
 
   button.addEventListener("click", async () => {
+
     const email = emailInput?.value.trim() || "";
+
     if (!isAllowedChatEmail(email)) {
+
       if (loginError) loginError.textContent =
+
         "Escribe uno de los correos autorizados para recuperar la clave.";
+
       emailInput?.focus();
+
       return;
+
     }
 
     button.disabled = true;
+
     if (loginError) loginError.textContent = "Enviando enlace de recuperación...";
+
     try {
+
       await sendPasswordResetEmail(auth, email);
+
       if (loginError) loginError.textContent =
+
         "Solicitud enviada. Revisa la bandeja de entrada y spam del correo autorizado.";
+
     } catch (error) {
+
       console.error("Error enviando recuperación:", error);
+
       const errors = {
+
         "auth/invalid-email": "El correo no es válido.",
+
         "auth/user-not-found": "No existe una cuenta con ese correo.",
+
         "auth/too-many-requests": "Demasiados intentos. Inténtalo más tarde.",
+
         "auth/network-request-failed": "Comprueba tu conexión a internet."
+
       };
+
       if (loginError) loginError.textContent =
+
         errors[error.code] || "No se pudo enviar el enlace de recuperación.";
+
     } finally {
+
       button.disabled = false;
+
     }
+
   });
 
   (loginError || loginForm).insertAdjacentElement("afterend", button);
+
 }
+
 installPasswordRecovery();
 
 logoutButton?.addEventListener("click", async () => {
@@ -2849,8 +2995,11 @@ sendForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   if (!isAllowedChatUser(currentUser)) {
+
     if (sendError) sendError.textContent = "Esta cuenta no está autorizada para enviar mensajes.";
+
     return;
+
   }
 
   const text = messageInput?.value.trim() || "";
@@ -2889,7 +3038,7 @@ sendForm?.addEventListener("submit", async (event) => {
 
         const file = selectedFiles[index];
 
-        const safeName = file.name.replace(/[**********\\\\\\\\\\\\\\\\\\\\\**********/:*?"<>|]/g, "_");
+        const safeName = file.name.replace(/[************\\\\\\\\\\\\\\\\\\\\\************/:*?"<>|]/g, "_");
 
         const uniqueName = `${Date.now()}_${crypto.randomUUID()}_${safeName}`;
 
@@ -3106,15 +3255,23 @@ async function startAuthSession() {
     sendError.textContent = "";
 
   }
+
   if (user && !isAllowedChatUser(user)) {
+
     await signOut(auth);
+
     currentUser = null;
+
     showGate();
+
     showStatus("Cuenta no autorizada para este chat");
+
     return;
+
   }
 
   if (user) {
+
     showChat();
 
     startMessagesListener(user);
