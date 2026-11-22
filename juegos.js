@@ -647,7 +647,7 @@ if (!appGrid || !phoneScreen) {
   screen.innerHTML = `
     <div class="rg-header">
       <button class="rg-back" id="rg-back" type="button" aria-label="Volver"><i class="fa-solid fa-chevron-left"></i></button>
-      <div><div class="rg-kicker">NUESTRAS ROLITAS</div><h2>Juegos ♡</h2></div>
+      <div><div class="rg-kicker">NUESTRAS ROLITAS</div><h2>Juegos</h2></div>
     </div>
     <div id="rg-home">
       <div class="rg-intro"><h3>Un ratito para jugar</h3><div class="rg-muted">Desafíos para dos. Puedes responder ahora o volver dentro de unos días.</div></div>
