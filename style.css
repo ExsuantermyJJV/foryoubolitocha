@@ -4310,3 +4310,370 @@ body[data-theme="light"] .letter-message {
   height: auto;
   overflow: hidden;
 }
+
+
+/* ==========================================================
+   AJUSTE DEL TITULAR: evita que la última letra quede cortada
+   ========================================================== */
+.intro {
+  max-width: min(100%, 1040px);
+  padding-inline: 12px;
+  overflow: visible;
+}
+
+.intro h1 {
+  display: block;
+  max-width: 100%;
+  padding: 0 .045em .08em;
+  overflow: visible;
+  font-size: clamp(2.65rem, 7.5vw, 5.65rem);
+  letter-spacing: -.045em;
+  line-height: 1.08;
+  white-space: normal;
+  overflow-wrap: normal;
+}
+
+.intro h1 em {
+  display: inline;
+}
+
+.title-heart {
+  position: relative;
+  margin-left: .10em;
+  vertical-align: .48em;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .intro {
+    padding-inline: 8px;
+  }
+
+  .intro h1 {
+    font-size: clamp(2.35rem, 9.2vw, 3.6rem);
+    letter-spacing: -.04em;
+    line-height: 1.12;
+  }
+}
+
+/* ==========================================================
+   SANTA CON PANCARTA PREMIUM REMOLCADA
+   El trineo va delante; la cuerda y la tela quedan detrás.
+   ========================================================== */
+
+/* Santa, renos y trineo: cabecera del conjunto */
+body::after {
+  content: "🦌  🦌  🦌  🎅  🛷";
+  position: fixed;
+  top: 12%;
+  left: 0;
+  z-index: 9999;
+  width: max-content;
+  pointer-events: none;
+  white-space: nowrap;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-size: clamp(31px, 4.5vw, 49px);
+  letter-spacing: -7px;
+  filter:
+    drop-shadow(0 5px 5px rgba(0,0,0,.35))
+    drop-shadow(0 0 13px rgba(255,222,164,.32));
+  opacity: 0;
+  animation: santa-banner-cross 24s cubic-bezier(.42,0,.58,1) infinite;
+}
+
+/* Cuerda fina que une el trineo con la pancarta */
+.page-shell::after {
+  content: "";
+  position: fixed;
+  top: calc(12% + 34px);
+  left: 205px;
+  z-index: 9997;
+  width: clamp(42px, 6vw, 78px);
+  height: 2px;
+  border-top: 2px dashed rgba(255,239,207,.95);
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,.45));
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: left center;
+  animation: santa-banner-cross 24s cubic-bezier(.42,0,.58,1) infinite,
+             santa-rope-sway 1.2s ease-in-out infinite alternate;
+}
+
+/* Tela de la pancarta: va detrás del trineo durante todo el recorrido */
+.page-shell::before {
+  content: "✦  FELIZ NAVIDADDDD  ✦";
+  position: fixed;
+  top: calc(12% + 9px);
+  left: 255px;
+  z-index: 9998;
+  display: flex;
+  width: clamp(255px, 34vw, 390px);
+  min-height: 54px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 25px 11px 30px;
+  box-sizing: border-box;
+  clip-path: polygon(0 5%, 96% 0, 100% 50%, 96% 100%, 0 95%, 4% 50%);
+  border: 1px solid rgba(255,225,166,.9);
+  border-radius: 3px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.28), transparent 23%, transparent 75%, rgba(69,0,16,.18)),
+    linear-gradient(105deg, #9d1738 0%, #d83d55 38%, #a91e3d 72%, #76132d 100%);
+  color: #fff4d8;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(16px, 2.05vw, 23px);
+  font-weight: 800;
+  letter-spacing: .075em;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+  text-shadow: 0 2px 3px rgba(58,0,15,.55), 0 0 12px rgba(255,226,175,.25);
+  box-shadow:
+    0 9px 22px rgba(0,0,0,.32),
+    0 0 18px rgba(255,196,122,.16),
+    inset 0 1px 0 rgba(255,255,255,.35),
+    inset 0 -3px 8px rgba(55,0,12,.22);
+  pointer-events: none;
+  opacity: 0;
+  animation: santa-banner-cross 24s cubic-bezier(.42,0,.58,1) infinite,
+             santa-cloth-flutter .85s ease-in-out infinite alternate;
+}
+
+/* Brillo decorativo en la tela */
+.page-shell {
+  --santa-banner-highlight: rgba(255,255,255,.22);
+}
+
+@keyframes santa-banner-cross {
+  0% {
+    transform: translate3d(115vw, 0, 0) rotate(-2deg);
+    opacity: 0;
+  }
+  5% { opacity: 1; }
+  18% { transform: translate3d(65vw, -9px, 0) rotate(1.5deg); }
+  48% { transform: translate3d(0, 0, 0) rotate(-1deg); }
+  78% { transform: translate3d(-65vw, -7px, 0) rotate(1deg); }
+  94% { opacity: 1; }
+  100% {
+    transform: translate3d(-125vw, 4px, 0) rotate(-2deg);
+    opacity: 0;
+  }
+}
+
+@keyframes santa-cloth-flutter {
+  from {
+    margin-top: -3px;
+    filter: brightness(1);
+  }
+  to {
+    margin-top: 4px;
+    filter: brightness(1.12);
+  }
+}
+
+@keyframes santa-rope-sway {
+  from { margin-top: -2px; }
+  to { margin-top: 3px; }
+}
+
+@media (max-width: 600px) {
+  body::after {
+    top: 11%;
+    font-size: 29px;
+    letter-spacing: -7px;
+  }
+
+  .page-shell::after {
+    top: calc(11% + 27px);
+    left: 145px;
+    width: 39px;
+  }
+
+  .page-shell::before {
+    top: calc(11% + 5px);
+    left: 185px;
+    width: 230px;
+    min-height: 42px;
+    padding: 8px 15px 9px 19px;
+    font-size: 14px;
+    letter-spacing: .035em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after,
+  .page-shell::before,
+  .page-shell::after {
+    animation: none;
+    display: none;
+  }
+}
+
+
+/* ==========================================================
+   SANTA ILUSTRADO: RENOS, TRINEO Y PANCARTA EN UNA SOLA ESCENA
+   Se elimina el conjunto de emojis para que no se vea fragmentado.
+   ========================================================== */
+body::after {
+  content: "";
+  position: fixed;
+  top: 10%;
+  left: 0;
+  z-index: 9999;
+  display: block;
+  width: 1040px;
+  height: 190px;
+  max-width: none;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDQwIiBoZWlnaHQ9IjE5MCIgdmlld0JveD0iMCAwIDEwNDAgMTkwIj4KPGRlZnM+CiA8bGluZWFyR3JhZGllbnQgaWQ9ImZ1ciIgeDI9IjAiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjZDlhNjZkIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjOTg2MDNkIi8+PC9saW5lYXJHcmFkaWVudD4KIDxsaW5lYXJHcmFkaWVudCBpZD0icmVkIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiNmZjY0N2IiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNhOTE1M2QiLz48L2xpbmVhckdyYWRpZW50PgogPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiNmZmYwYjUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNkNTliNDUiLz48L2xpbmVhckdyYWRpZW50PgogPGxpbmVhckdyYWRpZW50IGlkPSJjbG90aCIgeDI9IjAiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjZjM1YTc2Ii8+PHN0b3Agb2Zmc2V0PSIuNTUiIHN0b3AtY29sb3I9IiNjNTI0NGIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM4NTE3MzMiLz48L2xpbmVhckdyYWRpZW50PgogPGZpbHRlciBpZD0ic2hhZG93IiB4PSItMzAlIiB5PSItNTAlIiB3aWR0aD0iMTYwJSIgaGVpZ2h0PSIyMjAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSI0Ii8+PC9maWx0ZXI+CjwvZGVmcz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA0MCAwKSBzY2FsZSgtMSAxKSI+XG48IS0tIHNvZnQgZ3JvdW5kbGVzcyBnbG93IC0tPgo8ZWxsaXBzZSBjeD0iNTY1IiBjeT0iMTUxIiByeD0iNDYwIiByeT0iOSIgZmlsbD0iI2ZmYzhkYyIgb3BhY2l0eT0iLjE2IiBmaWx0ZXI9InVybCgjc2hhZG93KSIvPgo8IS0tIHJlaW5zIGFuZCBoYXJuZXNzIC0tPgo8cGF0aCBkPSJNNjggOTYgQzE2MCA2NSAyNzAgNzAgMzgyIDkxIE0xNjcgMTAwIEMyMzUgODMgMzA1IDgzIDM4MiA5MSBNMjY3IDEwMiBDMzE1IDkxIDM1MCA5MCAzODIgOTEiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2Y0ZDdhMCIgc3Ryb2tlLXdpZHRoPSIyLjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8IS0tIHJlaW5kZWVyIDEgLS0+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQyIDApIHRyYW5zbGF0ZSgxMDIgMCkgc2NhbGUoLTEgMSkiPgogPGVsbGlwc2UgY3g9IjQyIiBjeT0iMTAwIiByeD0iMzMiIHJ5PSIxOCIgZmlsbD0idXJsKCNmdXIpIi8+CiA8cGF0aCBkPSJNNTkgOTIgUTcxIDc3IDc5IDY5IEw5MSA3MiBRODYgODcgNzQgOTkgTDY0IDEwNloiIGZpbGw9InVybCgjZnVyKSIvPgogPGVsbGlwc2UgY3g9Ijg5IiBjeT0iNzIiIHJ4PSIxMyIgcnk9IjEwIiBmaWxsPSIjYzk4YjU1Ii8+CiA8ZWxsaXBzZSBjeD0iMTAxIiBjeT0iNzYiIHJ4PSI1IiByeT0iNCIgZmlsbD0iIzhkMjczOSIvPgogPHBhdGggZD0iTTgyIDYzIFE3NCA0OSA3OCAzOSBNNzggNDcgTDY3IDQyIE03OCA1MSBMODggNDIgTTk0IDY0IFExMDIgNDkgOTggMzggTTk5IDQ4IEwxMTAgNDIgTTk4IDUyIEw4OSA0MyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYzk5NjVkIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogPHBhdGggZD0iTTIxIDExMSBMMTggMTQwIE0zOSAxMTMgTDQyIDE0MSBNNTkgMTEwIEw2NCAxMzgiIHN0cm9rZT0iIzhjNTczYiIgc3Ryb2tlLXdpZHRoPSI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KIDxwYXRoIGQ9Ik0xOCAxNDAgbC01IDMgTTQyIDE0MSBsLTUgMyBNNjQgMTM4IGwtNSAzIiBzdHJva2U9IiMzMDIwMmEiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiA8cGF0aCBkPSJNMTIgOTQgUTEgODggNCA3OSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTg2MDNkIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogPGNpcmNsZSBjeD0iOTEiIGN5PSI3MCIgcj0iMiIgZmlsbD0iIzIxMTcyMyIvPgogPHBhdGggZD0iTTMyIDgzIFE0MyA3NyA1MyA4MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjFjMThhIiBzdHJva2Utd2lkdGg9IjMiIG9wYWNpdHk9Ii43Ii8+CjwvZz4KPCEtLSByZWluZGVlciAyIC0tPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNDggMCkgdHJhbnNsYXRlKDEwMiAwKSBzY2FsZSgtMSAxKSBzY2FsZSgxLjAyKSI+CiA8ZWxsaXBzZSBjeD0iNDIiIGN5PSIxMDAiIHJ4PSIzMyIgcnk9IjE4IiBmaWxsPSJ1cmwoI2Z1cikiLz4KIDxwYXRoIGQ9Ik01OSA5MiBRNzEgNzcgNzkgNjkgTDkxIDcyIFE4NiA4NyA3NCA5OSBMNjQgMTA2WiIgZmlsbD0idXJsKCNmdXIpIi8+CiA8ZWxsaXBzZSBjeD0iODkiIGN5PSI3MiIgcng9IjEzIiByeT0iMTAiIGZpbGw9IiNjOThiNTUiLz4KIDxlbGxpcHNlIGN4PSIxMDEiIGN5PSI3NiIgcng9IjUiIHJ5PSI0IiBmaWxsPSIjOGQyNzM5Ii8+CiA8cGF0aCBkPSJNODIgNjMgUTc0IDQ5IDc4IDM5IE03OCA0NyBMNjcgNDIgTTc4IDUxIEw4OCA0MiBNOTQgNjQgUTEwMiA0OSA5OCAzOCBNOTkgNDggTDExMCA0MiBNOTggNTIgTDg5IDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNjOTk2NWQiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiA8cGF0aCBkPSJNMjEgMTExIEwxOCAxNDAgTTM5IDExMyBMNDIgMTQxIE01OSAxMTAgTDY0IDEzOCIgc3Ryb2tlPSIjOGM1NzNiIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogPHBhdGggZD0iTTE4IDE0MCBsLTUgMyBNNDIgMTQxIGwtNSAzIE02NCAxMzggbC01IDMiIHN0cm9rZT0iIzMwMjAyYSIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KIDxwYXRoIGQ9Ik0xMiA5NCBRMSA4OCA0IDc5IiBmaWxsPSJub25lIiBzdHJva2U9IiM5ODYwM2QiIHN0cm9rZS13aWR0aD0iNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiA8Y2lyY2xlIGN4PSI5MSIgY3k9IjcwIiByPSIyIiBmaWxsPSIjMjExNzIzIi8+CiA8cGF0aCBkPSJNMzIgODMgUTQzIDc3IDUzIDgyIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMWMxOGEiIHN0cm9rZS13aWR0aD0iMyIgb3BhY2l0eT0iLjciLz4KPC9nPgo8IS0tIHJlaW5kZWVyIDMgLS0+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI1NCAwKSB0cmFuc2xhdGUoMTAyIDApIHNjYWxlKC0xIDEpIHNjYWxlKDEuMDQpIj4KIDxlbGxpcHNlIGN4PSI0MiIgY3k9IjEwMCIgcng9IjMzIiByeT0iMTgiIGZpbGw9InVybCgjZnVyKSIvPgogPHBhdGggZD0iTTU5IDkyIFE3MSA3NyA3OSA2OSBMOTEgNzIgUTg2IDg3IDc0IDk5IEw2NCAxMDZaIiBmaWxsPSJ1cmwoI2Z1cikiLz4KIDxlbGxpcHNlIGN4PSI4OSIgY3k9IjcyIiByeD0iMTMiIHJ5PSIxMCIgZmlsbD0iI2M5OGI1NSIvPgogPGVsbGlwc2UgY3g9IjEwMSIgY3k9Ijc2IiByeD0iNSIgcnk9IjQiIGZpbGw9IiM4ZDI3MzkiLz4KIDxwYXRoIGQ9Ik04MiA2MyBRNzQgNDkgNzggMzkgTTc4IDQ3IEw2NyA0MiBNNzggNTEgTDg4IDQyIE05NCA2NCBRMTAyIDQ5IDk4IDM4IE05OSA0OCBMMTEwIDQyIE05OCA1MiBMODkgNDMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2M5OTY1ZCIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KIDxwYXRoIGQ9Ik0yMSAxMTEgTDE4IDE0MCBNMzkgMTEzIEw0MiAxNDEgTTU5IDExMCBMNjQgMTM4IiBzdHJva2U9IiM4YzU3M2IiIHN0cm9rZS13aWR0aD0iNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiA8cGF0aCBkPSJNMTggMTQwIGwtNSAzIE00MiAxNDEgbC01IDMgTTY0IDEzOCBsLTUgMyIgc3Ryb2tlPSIjMzAyMDJhIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogPHBhdGggZD0iTTEyIDk0IFExIDg4IDQgNzkiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzk4NjAzZCIgc3Ryb2tlLXdpZHRoPSI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KIDxjaXJjbGUgY3g9IjkxIiBjeT0iNzAiIHI9IjIiIGZpbGw9IiMyMTE3MjMiLz4KIDxwYXRoIGQ9Ik0zMiA4MyBRNDMgNzcgNTMgODIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2YxYzE4YSIgc3Ryb2tlLXdpZHRoPSIzIiBvcGFjaXR5PSIuNyIvPgo8L2c+CjwhLS0gYmVsbHMgb24gaGFybmVzcyAtLT4KPGcgZmlsbD0idXJsKCNnb2xkKSIgc3Ryb2tlPSIjOWQ2YjJjIiBzdHJva2Utd2lkdGg9IjEiPjxjaXJjbGUgY3g9IjExOCIgY3k9IjEwMyIgcj0iNSIvPjxjaXJjbGUgY3g9IjIyNSIgY3k9IjEwMyIgcj0iNSIvPjxjaXJjbGUgY3g9IjMzMyIgY3k9IjEwMyIgcj0iNSIvPjwvZz4KPCEtLSBzbGVpZ2ggYm9keSAtLT4KPHBhdGggZD0iTTM4MCAxMTcgUTQxNSAxMDUgNDU5IDExMSBMNTM1IDEyNSBRNTUwIDEyOCA1NDYgMTM5IFE1NDAgMTUxIDUwNiAxNTEgTDQyMCAxNDcgUTM4NSAxNDUgMzcxIDEzMloiIGZpbGw9InVybCgjcmVkKSIgc3Ryb2tlPSIjZmZkNThjIiBzdHJva2Utd2lkdGg9IjMiLz4KPHBhdGggZD0iTTM4NiAxNDYgUTQyNCAxNjIgNTAxIDE1OCBRNTM2IDE1NyA1NTAgMTQ0IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjZ29sZCkiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjxwYXRoIGQ9Ik0zOTMgMTUzIFE0MzAgMTY5IDUwOCAxNjUgUTU0NCAxNjMgNTU3IDE0OSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmMGMxIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjxwYXRoIGQ9Ik0zODkgMTE4IFE0MTAgOTIgNDM4IDkxIEw0ODMgMTAzIiBmaWxsPSJub25lIiBzdHJva2U9IiNmNWM2NmUiIHN0cm9rZS13aWR0aD0iNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjwhLS0gU2FudGEgY29hdC9ib2R5IC0tPgo8cGF0aCBkPSJNNDI1IDEwNSBRNDIwIDc2IDQ0MSA2NSBRNDY2IDU4IDQ4MSA4MSBMNDg3IDExOSBMNDMxIDEyMloiIGZpbGw9IiNjOTFmNDMiIHN0cm9rZT0iIzhmMTYzMiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik00MzIgMTAzIFE0NTUgMTEyIDQ4MSAxMDIgTDQ4NiAxMTkgTDQzMCAxMjJaIiBmaWxsPSIjZmZmMGRjIi8+CjxyZWN0IHg9IjQ1MyIgeT0iODYiIHdpZHRoPSI4IiBoZWlnaHQ9IjMyIiByeD0iMyIgZmlsbD0iI2Y3ZGNhZSIvPgo8Y2lyY2xlIGN4PSI0NTciIGN5PSIxMDUiIHI9IjMiIGZpbGw9IiNkNGEyNGQiLz4KPCEtLSBTYW50YSBmYWNlIGFuZCBiZWFyZCAtLT4KPGVsbGlwc2UgY3g9IjQ1NSIgY3k9IjY2IiByeD0iMjMiIHJ5PSIyMiIgZmlsbD0iI2YyYmQ5MSIvPgo8cGF0aCBkPSJNNDM0IDY2IFE0MzEgNDMgNDU0IDQxIFE0NzkgNDIgNDc4IDY1IFE0NjYgNTUgNDU1IDU2IFE0NDQgNTYgNDM0IDY2WiIgZmlsbD0iI2ZmZjRlOSIvPgo8cGF0aCBkPSJNNDM1IDcwIFE0NDAgODMgNDU1IDg3IFE0NzEgODMgNDc3IDY5IEw0NzQgOTEgUTQ1NiAxMTEgNDM5IDkxWiIgZmlsbD0iI2ZmZjhlZCIvPgo8Y2lyY2xlIGN4PSI0NDciIGN5PSI2NyIgcj0iMi41IiBmaWxsPSIjMzgyMzMzIi8+PGNpcmNsZSBjeD0iNDY0IiBjeT0iNjciIHI9IjIuNSIgZmlsbD0iIzM4MjMzMyIvPgo8ZWxsaXBzZSBjeD0iNDU1IiBjeT0iNzQiIHJ4PSI0IiByeT0iMyIgZmlsbD0iI2Q3N2U3MiIvPgo8IS0tIFNhbnRhIGhhdCAtLT4KPHBhdGggZD0iTTQzMyA1MyBRNDM3IDIyIDQ2OCAyOCBRNDgxIDMzIDQ4MiA1MyBRNDYwIDQ2IDQzMyA1M1oiIGZpbGw9IiNkODI3NGIiLz4KPHBhdGggZD0iTTQzMyA1MiBRNDU2IDQ1IDQ4MSA1MyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmNWViIiBzdHJva2Utd2lkdGg9IjkiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8Y2lyY2xlIGN4PSI0ODAiIGN5PSIyOSIgcj0iOCIgZmlsbD0iI2ZmZjdlZiIvPgo8IS0tIFNhbnRhIGFybSB3YXZpbmcgLS0+CjxwYXRoIGQ9Ik00NzggOTEgUTUwMCA3NyA1MDEgNjEiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2M5MWY0MyIgc3Ryb2tlLXdpZHRoPSIxMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjxjaXJjbGUgY3g9IjUwMiIgY3k9IjU3IiByPSI4IiBmaWxsPSIjZjJiZDkxIi8+CjwhLS0gcmVpbnMgZnJvbSBsYXN0IGRlZXIgdG8gc2xlaWdoIC0tPgo8cGF0aCBkPSJNMzU4IDkyIFEzNzAgODkgMzkwIDEwMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjVkOGE0IiBzdHJva2Utd2lkdGg9IjIuNSIvPgo8IS0tIGJhbm5lciB0ZXRoZXIgLS0+CjxwYXRoIGQ9Ik01NDQgMTI4IFE1NzMgMTE1IDYwMiAxMjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2Y5ZTViZCIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjUgNCIvPgo8IS0tIGZseWluZyBiYW5uZXIgLS0+CjxwYXRoIGQ9Ik01OTYgODMgUTcyMCA2NyAxMDE3IDg2IEwxMDAzIDE0MCBRNzg2IDEyMSA1OTYgMTQzIFE2MTIgMTEzIDU5NiA4M1oiIGZpbGw9InVybCgjY2xvdGgpIiBzdHJva2U9IiNmNWNmOGQiIHN0cm9rZS13aWR0aD0iMyIvPgo8cGF0aCBkPSJNNjEwIDkxIFE3ODAgNzkgMTAwOCA5NCBNNjA5IDEzNSBRODAwIDExNiAxMDAwIDEzMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZiMmI4IiBzdHJva2Utd2lkdGg9IjIiIG9wYWNpdHk9Ii41Ii8+CjxwYXRoIGQ9Ik02MjAgMTEyIFE4MDAgOTQgMTAwOCAxMTEiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZjBkMiIgc3Ryb2tlLXdpZHRoPSIxLjUiIG9wYWNpdHk9Ii4yMiIvPgoKPHBhdGggZD0iTTYyMCA5NCBsNSA4IDkgMSAtNyA2IDIgOSAtOSAtNSAtOCA1IDIgLTkgLTcgLTYgOSAtMVoiIGZpbGw9IiNmZmU1YTciIG9wYWNpdHk9Ii45Ii8+CjxwYXRoIGQ9Ik05ODUgMTAyIGw0IDYgNyAxIC01IDUgMSA3IC03IC00IC02IDQgMiAtNyAtNSAtNSA3IC0xWiIgZmlsbD0iI2ZmZTVhNyIgb3BhY2l0eT0iLjgiLz4KCjwvZz5cbjx0ZXh0IHg9IjIzMCIgeT0iMTE5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIKIGZvbnQtc2l6ZT0iMjUiIGZvbnQtd2VpZ2h0PSJib2xkIiBsZXR0ZXItc3BhY2luZz0iMS4xIiBmaWxsPSIjZmZmNGRjIgogc3Ryb2tlPSIjOGUxODMzIiBzdHJva2Utd2lkdGg9Ii43IiBwYWludC1vcmRlcj0ic3Ryb2tlIj5GRUxJWiBOQVZJREFEREREPC90ZXh0Pgo8L3N2Zz4=");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  filter: drop-shadow(0 9px 13px rgba(0,0,0,.28));
+  opacity: 0;
+  transform: translate3d(110vw, 0, 0);
+  animation: santa-illustration-flight 25s linear infinite;
+}
+
+/* Desactiva las antiguas piezas separadas de la pancarta */
+.page-shell::before,
+.page-shell::after {
+  content: none !important;
+  display: none !important;
+}
+
+@keyframes santa-illustration-flight {
+  0% {
+    transform: translate3d(-115vw, 24px, 0) rotate(2deg);
+    opacity: 0;
+  }
+  5% { opacity: 1; }
+  20% { transform: translate3d(-65vw, -7px, 0) rotate(-1.5deg); }
+  42% { transform: translate3d(-18vw, -24px, 0) rotate(-2deg); }
+  62% { transform: translate3d(28vw, -5px, 0) rotate(1.2deg); }
+  82% { transform: translate3d(75vw, 19px, 0) rotate(2deg); }
+  94% { opacity: 1; }
+  100% {
+    transform: translate3d(120vw, 30px, 0) rotate(1deg);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  body::after {
+    top: 10%;
+    width: 1040px;
+    height: 190px;
+    transform-origin: left center;
+    animation-name: santa-illustration-flight-mobile;
+  }
+}
+
+@keyframes santa-illustration-flight-mobile {
+  0% { transform: translate3d(-105vw, 22px, 0) scale(.78) rotate(2deg); opacity: 0; }
+  5% { opacity: 1; }
+  20% { transform: translate3d(-58vw, -6px, 0) scale(.78) rotate(-1.5deg); }
+  42% { transform: translate3d(-12vw, -20px, 0) scale(.78) rotate(-2deg); }
+  62% { transform: translate3d(34vw, -4px, 0) scale(.78) rotate(1.2deg); }
+  82% { transform: translate3d(82vw, 17px, 0) scale(.78) rotate(2deg); }
+  94% { opacity: 1; }
+  100% { transform: translate3d(135vw, 26px, 0) scale(.78) rotate(1deg); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after {
+    animation: none;
+    display: none;
+  }
+}
+
+
+/* ==========================================================
+   AJUSTE FINAL: Santa acompaña el encabezado sin taparlo
+   La ilustración queda detrás del contenido y más compacta.
+   ========================================================== */
+body::after {
+  top: 3%;
+  z-index: 0;
+  width: 1040px;
+  height: 190px;
+  opacity: 0;
+  filter: drop-shadow(0 7px 12px rgba(0,0,0,.22));
+  animation-name: santa-flight-behind-title;
+  animation-duration: 27s;
+  animation-timing-function: ease-in-out;
+}
+
+/* El título y los elementos de la página permanecen delante de Santa */
+.page-shell {
+  position: relative;
+  z-index: 1;
+}
+
+.intro {
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes santa-flight-behind-title {
+  0% {
+    transform: translate3d(-110vw, 18px, 0) scale(.66) rotate(2deg);
+    opacity: 0;
+  }
+  6% { opacity: .88; }
+  20% {
+    transform: translate3d(-66vw, -5px, 0) scale(.66) rotate(-2deg);
+  }
+  38% {
+    transform: translate3d(-28vw, -18px, 0) scale(.66) rotate(-3deg);
+  }
+  55% {
+    transform: translate3d(12vw, -4px, 0) scale(.66) rotate(1deg);
+  }
+  73% {
+    transform: translate3d(54vw, 13px, 0) scale(.66) rotate(3deg);
+  }
+  94% { opacity: .88; }
+  100% {
+    transform: translate3d(112vw, 22px, 0) scale(.66) rotate(1deg);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  body::after {
+    top: 2%;
+    width: 1040px;
+    height: 190px;
+    animation-name: santa-flight-behind-title-mobile;
+  }
+}
+
+@keyframes santa-flight-behind-title-mobile {
+  0% {
+    transform: translate3d(-110vw, 14px, 0) scale(.43) rotate(2deg);
+    opacity: 0;
+  }
+  6% { opacity: .82; }
+  20% {
+    transform: translate3d(-66vw, -4px, 0) scale(.43) rotate(-2deg);
+  }
+  38% {
+    transform: translate3d(-28vw, -13px, 0) scale(.43) rotate(-3deg);
+  }
+  55% {
+    transform: translate3d(12vw, -3px, 0) scale(.43) rotate(1deg);
+  }
+  73% {
+    transform: translate3d(54vw, 10px, 0) scale(.43) rotate(3deg);
+  }
+  94% { opacity: .82; }
+  100% {
+    transform: translate3d(112vw, 18px, 0) scale(.43) rotate(1deg);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after { display: none; animation: none; }
+}
